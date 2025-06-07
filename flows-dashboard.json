@@ -1,0 +1,660 @@
+[
+    {
+        "id": "main_flow",
+        "type": "tab",
+        "label": "Dashboard Monitoring",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "af670946a1db9987",
+        "type": "group",
+        "z": "main_flow",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "976d15a4a6d6cc51",
+            "0df5f22647f3e210",
+            "07d8f634da9fdd82",
+            "b46852623901ece3",
+            "d935d26fc6a1c462",
+            "8f65b40b22503db8"
+        ],
+        "x": 94,
+        "y": 639,
+        "w": 812,
+        "h": 162
+    },
+    {
+        "id": "5acf14ec0c638bbe",
+        "type": "group",
+        "z": "main_flow",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "080f8598217b8bef",
+            "87ae8de1a3040408",
+            "cf3dc0f817be13d7",
+            "8968757a100422e5",
+            "020621f22bd12015",
+            "13654640e6e0a6cd",
+            "73d4dc3904338a4f",
+            "bbdb4749705da9a3",
+            "ee21352b9dd0e672",
+            "6b402f2a1f226bf5",
+            "8146bdca361b2415",
+            "3d92dcd7847b9202"
+        ],
+        "x": 74,
+        "y": 19,
+        "w": 1292,
+        "h": 342
+    },
+    {
+        "id": "79cc9a2148ecadd0",
+        "type": "group",
+        "z": "main_flow",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "store_database",
+            "store_dht",
+            "store_ping",
+            "store_ldr",
+            "db_success"
+        ],
+        "x": 314,
+        "y": 419,
+        "w": 852,
+        "h": 162
+    },
+    {
+        "id": "store_database",
+        "type": "function",
+        "z": "main_flow",
+        "g": "79cc9a2148ecadd0",
+        "name": "Prepare for Database",
+        "func": "var data = msg.payload;\nvar timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');\n\n// DHT Data\nvar msg1 = {\n    topic: \"INSERT INTO dht_data (timestamp, temperature, humidity) VALUES (?, ?, ?)\",\n    payload: [timestamp, data.temperature, data.humidity],\n    sensor_type: 'DHT'\n};\n\n// PING Data\nvar msg2 = {\n    topic: \"INSERT INTO ping_data (timestamp, distance) VALUES (?, ?)\",\n    payload: [timestamp, data.ping_distance],\n    sensor_type: 'PING'\n};\n\n// LDR Data\nvar msg3 = {\n    topic: \"INSERT INTO ldr_data (timestamp, light_level) VALUES (?, ?)\",\n    payload: [timestamp, data.ldr],\n    sensor_type: 'LDR'\n};\n\nreturn [msg1, msg2, msg3];  // 👈 perhatikan bentuk return-nya\n",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 500,
+        "wires": [
+            [
+                "store_dht"
+            ],
+            [
+                "store_ping"
+            ],
+            [
+                "store_ldr"
+            ]
+        ]
+    },
+    {
+        "id": "store_dht",
+        "type": "mysql",
+        "z": "main_flow",
+        "g": "79cc9a2148ecadd0",
+        "mydb": "mysql_config",
+        "name": "Store DHT Data",
+        "x": 760,
+        "y": 460,
+        "wires": [
+            [
+                "db_success"
+            ]
+        ]
+    },
+    {
+        "id": "store_ping",
+        "type": "mysql",
+        "z": "main_flow",
+        "g": "79cc9a2148ecadd0",
+        "mydb": "mysql_config",
+        "name": "Store PING Data",
+        "x": 770,
+        "y": 500,
+        "wires": [
+            [
+                "db_success"
+            ]
+        ]
+    },
+    {
+        "id": "store_ldr",
+        "type": "mysql",
+        "z": "main_flow",
+        "g": "79cc9a2148ecadd0",
+        "mydb": "mysql_config",
+        "name": "Store LDR Data",
+        "x": 760,
+        "y": 540,
+        "wires": [
+            [
+                "db_success"
+            ]
+        ]
+    },
+    {
+        "id": "db_success",
+        "type": "debug",
+        "z": "main_flow",
+        "g": "79cc9a2148ecadd0",
+        "name": "Database Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1030,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "080f8598217b8bef",
+        "type": "mqtt in",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "name": "All Sensor Data",
+        "topic": "arduino_car/sensors",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "810f9cc363994c26",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 180,
+        "y": 120,
+        "wires": [
+            [
+                "87ae8de1a3040408",
+                "store_database"
+            ]
+        ]
+    },
+    {
+        "id": "87ae8de1a3040408",
+        "type": "function",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "name": "Split Sensor Data",
+        "func": "// Extract individual sensor values from payload\nvar data = msg.payload;\n\nif (!data || typeof data !== 'object') {\n    node.error('Invalid sensor data received');\n    return null;\n}\n\n// Temperature output\nvar msg1 = {\n    payload: data.temperature || 0,\n    topic: \"temperature\",\n    timestamp: new Date().toISOString()\n};\n\n// Humidity output\nvar msg2 = {\n    payload: data.humidity || 0,\n    topic: \"humidity\",\n    timestamp: new Date().toISOString()\n};\n\n// Distance output\nvar msg3 = {\n    payload: data.ping_distance || 0,\n    topic: \"distance\",\n    timestamp: new Date().toISOString()\n};\n\nreturn [msg1, msg2, msg3];",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 140,
+        "wires": [
+            [
+                "020621f22bd12015",
+                "6b402f2a1f226bf5"
+            ],
+            [
+                "13654640e6e0a6cd",
+                "8146bdca361b2415"
+            ],
+            [
+                "73d4dc3904338a4f",
+                "3d92dcd7847b9202"
+            ]
+        ]
+    },
+    {
+        "id": "cf3dc0f817be13d7",
+        "type": "inject",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "name": "Simulate Sensor Data",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "arduino_car/sensors",
+        "payload": "",
+        "payloadType": "str",
+        "x": 250,
+        "y": 320,
+        "wires": [
+            [
+                "8968757a100422e5"
+            ]
+        ]
+    },
+    {
+        "id": "8968757a100422e5",
+        "type": "function",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "name": "Generate Realistic Data",
+        "func": "// Generate realistic sensor data for Arduino car\nvar data = {\n    temperature: Math.round((Math.random() * 20 + 15) * 10) / 10,  // 15-35°C\n    humidity: Math.round(Math.random() * 50 + 30),                   // 30-80%\n    ping_distance: Math.round((Math.random() * 180 + 5) * 10) / 10,  // 5-185cm\n    ldr: Math.round(Math.random() * 1024),                           // 0-1024 (analog reading)\n    timestamp: new Date().toISOString()\n};\n\nmsg.payload = data;\nmsg.topic = \"arduino_car/sensors\";\n\n// Log untuk debugging\nnode.log(`Generated data: Temp=${data.temperature}°C, Humidity=${data.humidity}%, Distance=${data.ping_distance}cm, Light=${data.ldr}`);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 320,
+        "wires": [
+            [
+                "87ae8de1a3040408"
+            ]
+        ]
+    },
+    {
+        "id": "020621f22bd12015",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Temperature Gauge",
+        "order": 2,
+        "width": 7,
+        "height": 5,
+        "format": "<div class=\"custom-gauge temperature\">\n    <h3 class=\"gauge-title\">🌡️ Temperature</h3>\n    <div class=\"gauge\">\n        <svg class=\"gauge-svg\" viewBox=\"0 0 200 200\">\n            <defs>\n                <linearGradient id=\"tempGradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n                    <stop offset=\"0%\" style=\"stop-color:#62a0ea\" />\n                    <stop offset=\"50%\" style=\"stop-color:#e6e600\" />\n                    <stop offset=\"100%\" style=\"stop-color:#ca3838\" />\n                </linearGradient>\n            </defs>\n            <circle class=\"gauge-bg\" cx=\"100\" cy=\"100\" r=\"85\" />\n            <circle class=\"gauge-fill\" cx=\"100\" cy=\"100\" r=\"85\" stroke-dasharray=\"0 534\" id=\"tempFill\" />\n        </svg>\n        <div class=\"gauge-value\" id=\"tempValue\">{{msg.payload}}<span class=\"gauge-unit\">°C</span></div>\n        <div class=\"gauge-indicator\" id=\"tempIndicator\"></div>\n    </div>\n    <div class=\"status-indicator\" id=\"tempStatus\">\n        <span class=\"status-text\" id=\"tempStatusText\">Normal</span>\n        <div class=\"status-bar\" id=\"tempStatusBar\"></div>\n    </div>\n</div>\n\n<style>\n    .status-indicator {\n        margin-top: 10px;\n        text-align: center;\n    }\n\n    .status-text {\n        font-weight: bold;\n        font-size: 14px;\n        display: block;\n        margin-bottom: 5px;\n    }\n\n    .status-bar {\n        height: 6px;\n        border-radius: 3px;\n        margin: 0 auto;\n        width: 80%;\n        transition: background-color 0.3s ease;\n    }\n\n    .status-normal {\n        background-color: #2ca02c;\n    }\n\n    .status-medium {\n        background-color: #e6e600;\n    }\n\n    .status-high {\n        background-color: #ca3838;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            var value = parseFloat(data.payload);\n            var max = 50; // Max temperature scale\n            var percentage = Math.min((value / max) * 100, 100);\n            var circumference = 534; // 2 * PI * 85\n            var strokeLength = (percentage / 100) * circumference;\n            \n            var fill = document.getElementById('tempFill');\n            var indicator = document.getElementById('tempIndicator');\n            var statusText = document.getElementById('tempStatusText');\n            var statusBar = document.getElementById('tempStatusBar');\n            \n            if (fill) {\n                fill.style.strokeDasharray = strokeLength + ' ' + circumference;\n            }\n            \n            if (indicator) {\n                var rotation = (percentage / 100) * 270 - 135;\n                indicator.style.transform = 'translate(-50%, -100%) rotate(' + rotation + 'deg)';\n            }\n            \n            // Temperature status logic\n            var status, statusClass;\n            if (value < 20) {\n                status = 'Normal';\n                statusClass = 'status-normal';\n            } else if (value >= 20 && value <= 35) {\n                status = 'Medium';\n                statusClass = 'status-medium';\n            } else {\n                status = 'High';\n                statusClass = 'status-high';\n            }\n            \n            if (statusText) {\n                statusText.textContent = status;\n                statusText.style.color = statusClass === 'status-normal' ? '#2ca02c' : \n                                       statusClass === 'status-medium' ? '#e6e600' : '#ca3838';\n            }\n            \n            if (statusBar) {\n                statusBar.className = 'status-bar ' + statusClass;\n            }\n        }\n    });\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 940,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "13654640e6e0a6cd",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Humidity Gauge",
+        "order": 3,
+        "width": 7,
+        "height": 5,
+        "format": "<div class=\"custom-gauge humidity\">\n    <h3 class=\"gauge-title\">💧 Humidity</h3>\n    <div class=\"gauge\">\n        <svg class=\"gauge-svg\" viewBox=\"0 0 200 200\">\n            <defs>\n                <linearGradient id=\"humidityGradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n                    <stop offset=\"0%\" style=\"stop-color:#ca3838\" />\n                    <stop offset=\"50%\" style=\"stop-color:#e6e600\" />\n                    <stop offset=\"100%\" style=\"stop-color:#62a0ea\" />\n                </linearGradient>\n            </defs>\n            <circle class=\"gauge-bg\" cx=\"100\" cy=\"100\" r=\"85\" />\n            <circle class=\"gauge-fill\" cx=\"100\" cy=\"100\" r=\"85\" stroke-dasharray=\"0 534\" id=\"humidityFill\" />\n        </svg>\n        <div class=\"gauge-value\" id=\"humidityValue\">{{msg.payload}}<span class=\"gauge-unit\">%</span></div>\n        <div class=\"gauge-indicator\" id=\"humidityIndicator\"></div>\n    </div>\n    <div class=\"status-indicator\" id=\"humidityStatus\">\n        <span class=\"status-text\" id=\"humidityStatusText\">Normal</span>\n        <div class=\"status-bar\" id=\"humidityStatusBar\"></div>\n    </div>\n</div>\n\n<style>\n    .status-indicator {\n        margin-top: 10px;\n        text-align: center;\n    }\n\n    .status-text {\n        font-weight: bold;\n        font-size: 14px;\n        display: block;\n        margin-bottom: 5px;\n    }\n\n    .status-bar {\n        height: 6px;\n        border-radius: 3px;\n        margin: 0 auto;\n        width: 80%;\n        transition: background-color 0.3s ease;\n    }\n\n    .status-low {\n        background-color: #ca3838;\n    }\n\n    .status-normal {\n        background-color: #2ca02c;\n    }\n\n    .status-high {\n        background-color: #62a0ea;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            var value = parseFloat(data.payload);\n            var max = 100; // Max humidity percentage\n            var percentage = Math.min((value / max) * 100, 100);\n            var circumference = 534;\n            var strokeLength = (percentage / 100) * circumference;\n            \n            var fill = document.getElementById('humidityFill');\n            var indicator = document.getElementById('humidityIndicator');\n            var statusText = document.getElementById('humidityStatusText');\n            var statusBar = document.getElementById('humidityStatusBar');\n            \n            if (fill) {\n                fill.style.strokeDasharray = strokeLength + ' ' + circumference;\n            }\n            \n            if (indicator) {\n                var rotation = (percentage / 100) * 270 - 135;\n                indicator.style.transform = 'translate(-50%, -100%) rotate(' + rotation + 'deg)';\n            }\n            \n            // Humidity status logic\n            var status, statusClass;\n            if (value < 30) {\n                status = 'Low';\n                statusClass = 'status-low';\n            } else if (value >= 30 && value <= 70) {\n                status = 'Normal';\n                statusClass = 'status-normal';\n            } else {\n                status = 'High';\n                statusClass = 'status-high';\n            }\n            \n            if (statusText) {\n                statusText.textContent = status;\n                statusText.style.color = statusClass === 'status-low' ? '#ca3838' : \n                                       statusClass === 'status-normal' ? '#2ca02c' : '#62a0ea';\n            }\n            \n            if (statusBar) {\n                statusBar.className = 'status-bar ' + statusClass;\n            }\n        }\n    });\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 680,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "73d4dc3904338a4f",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Distance Gauge",
+        "order": 4,
+        "width": 7,
+        "height": 5,
+        "format": "<div class=\"custom-gauge distance\">\n    <h3 class=\"gauge-title\">📏 Distance</h3>\n    <div class=\"gauge\">\n        <svg class=\"gauge-svg\" viewBox=\"0 0 200 200\">\n            <defs>\n                <linearGradient id=\"distanceGradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n                    <stop offset=\"0%\" style=\"stop-color:#ca3838\"/>\n                    <stop offset=\"50%\" style=\"stop-color:#e6e600\"/>\n                    <stop offset=\"100%\" style=\"stop-color:#2ca02c\"/>\n                </linearGradient>\n            </defs>\n            <circle class=\"gauge-bg\" cx=\"100\" cy=\"100\" r=\"85\"/>\n            <circle class=\"gauge-fill\" cx=\"100\" cy=\"100\" r=\"85\" \n                    stroke-dasharray=\"0 534\" id=\"distanceFill\"/>\n        </svg>\n        <div class=\"gauge-value\" id=\"distanceValue\">{{msg.payload}}<span class=\"gauge-unit\">cm</span></div>\n        <div class=\"gauge-indicator\" id=\"distanceIndicator\"></div>\n    </div>\n    <div class=\"status-indicator\" id=\"distanceStatus\">\n        <span class=\"status-text\" id=\"distanceStatusText\">Medium</span>\n        <div class=\"status-bar\" id=\"distanceStatusBar\"></div>\n    </div>\n</div>\n\n<style>\n.status-indicator {\n    margin-top: 10px;\n    text-align: center;\n}\n.status-text {\n    font-weight: bold;\n    font-size: 14px;\n    display: block;\n    margin-bottom: 5px;\n}\n.status-bar {\n    height: 6px;\n    border-radius: 3px;\n    margin: 0 auto;\n    width: 80%;\n    transition: background-color 0.3s ease;\n}\n.status-close { background-color: #ca3838; }\n.status-medium { background-color: #e6e600; }\n.status-far { background-color: #2ca02c; }\n</style>\n\n<script>\n(function(scope) {\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            var value = parseFloat(data.payload);\n            var max = 200; // Max distance in cm\n            var percentage = Math.min((value / max) * 100, 100);\n            var circumference = 534;\n            var strokeLength = (percentage / 100) * circumference;\n            \n            var fill = document.getElementById('distanceFill');\n            var indicator = document.getElementById('distanceIndicator');\n            var statusText = document.getElementById('distanceStatusText');\n            var statusBar = document.getElementById('distanceStatusBar');\n            \n            if (fill) {\n                fill.style.strokeDasharray = strokeLength + ' ' + circumference;\n            }\n            \n            if (indicator) {\n                var rotation = (percentage / 100) * 270 - 135;\n                indicator.style.transform = 'translate(-50%, -100%) rotate(' + rotation + 'deg)';\n            }\n            \n            // Distance status logic\n            var status, statusClass;\n            if (value < 20) {\n                status = 'Close';\n                statusClass = 'status-close';\n            } else if (value >= 20 && value <= 50) {\n                status = 'Medium';\n                statusClass = 'status-medium';\n            } else {\n                status = 'Far';\n                statusClass = 'status-far';\n            }\n            \n            if (statusText) {\n                statusText.textContent = status;\n                statusText.style.color = statusClass === 'status-close' ? '#ca3838' : \n                                       statusClass === 'status-medium' ? '#e6e600' : '#2ca02c';\n            }\n            \n            if (statusBar) {\n                statusBar.className = 'status-bar ' + statusClass;\n            }\n        }\n    });\n})(scope);",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 680,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bbdb4749705da9a3",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Dashboard Header",
+        "order": 1,
+        "width": 28,
+        "height": 6,
+        "format": "<div class=\"dashboard-header\">\n    <div class=\"car-icon\">🚗</div>\n    <h1 class=\"dashboard-title\">ARDUINO CAR MONITOR</h1>\n    <p class=\"dashboard-subtitle\">Real-time Sensor Dashboard</p>\n    <p class=\"dashboard-subtitle\">Kelompok 5</p>\n    <div class=\"status-indicator\" id=\"connectionStatus\">🟢 CONNECTED</div>\n</div>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n.dashboard-header {\n    text-align: center;\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 20px;\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);\n    font-family: 'Orbitron', monospace;\n}\n\n.car-icon {\n    font-size: 2.5rem;\n    margin-bottom: 10px;\n    animation: bounce 3s ease-in-out infinite;\n}\n\n@keyframes bounce {\n    0%, 100% { transform: translateY(0); }\n    50% { transform: translateY(-8px); }\n}\n\n.dashboard-title {\n    font-size: 2.2rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 20px #00ff88;\n    margin: 10px 0;\n    animation: pulse 2s ease-in-out infinite alternate;\n}\n\n@keyframes pulse {\n    from { text-shadow: 0 0 20px #00ff88; }\n    to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}\n\n.dashboard-subtitle {\n    color: #888;\n    font-size: 1rem;\n    margin-bottom: 10px;\n}\n\n.status-indicator {\n    font-size: 0.9rem;\n    color: #00ff88;\n    font-weight: 700;\n}\n</style>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1250,
+        "y": 60,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ee21352b9dd0e672",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Global Styles",
+        "order": 10,
+        "width": 28,
+        "height": 1,
+        "format": "<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n/* Global Dashboard Styles */\nbody, .nr-dashboard {\n    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%) !important;\n    font-family: 'Orbitron', monospace !important;\n    color: #00ff88 !important;\n}\n\n.custom-gauge {\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 20px;\n    padding: 20px;\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    position: relative;\n    overflow: hidden;\n    font-family: 'Orbitron', monospace;\n    height: 100%;\n}\n\n.custom-gauge::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);\n    animation: shimmer 3s infinite;\n}\n\n@keyframes shimmer {\n    0% { left: -100%; }\n    100% { left: 100%; }\n}\n\n.gauge-title {\n    text-align: center;\n    font-size: 1.1rem;\n    font-weight: 700;\n    margin-bottom: 15px;\n    color: #00ff88;\n    text-transform: uppercase;\n    letter-spacing: 1px;\n}\n\n.gauge {\n    width: 160px;\n    height: 160px;\n    margin: 0 auto;\n    position: relative;\n}\n\n.gauge-svg {\n    width: 100%;\n    height: 100%;\n    transform: rotate(-90deg);\n}\n\n.gauge-bg {\n    fill: none;\n    stroke: #333;\n    stroke-width: 12;\n    stroke-linecap: round;\n} \n\n.gauge-fill {\n    fill: none;\n    stroke-width: 12;\n    stroke-linecap: round;\n    transition: stroke-dasharray 0.8s ease;\n}\n\n.gauge-value {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    font-size: 1.8rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 10px currentColor;\n    text-align: center;\n}\n\n.gauge-unit {\n    font-size: 0.7rem;\n    opacity: 0.8;\n    display: block;\n    margin-top: 3px;\n}\n\n.gauge-indicator {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    width: 2px;\n    height: 65px;\n    background: linear-gradient(to top, #ff6b35, #ffd700);\n    transform-origin: bottom center;\n    transform: translate(-50%, -100%) rotate(-135deg);\n    border-radius: 2px;\n    box-shadow: 0 0 8px rgba(255, 107, 53, 0.8);\n    transition: transform 0.8s ease;\n}\n\n/* Gauge specific colors */\n.temperature .gauge-fill { stroke: url(#tempGradient); }\n.humidity .gauge-fill { stroke: url(#humidityGradient); }\n.distance .gauge-fill { stroke: url(#distanceGradient); }\n.light .gauge-fill { stroke: url(#lightGradient); }\n</style>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "global",
+        "className": "",
+        "x": 1250,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6b402f2a1f226bf5",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Temperature Chart",
+        "order": 6,
+        "width": 7,
+        "height": 6,
+        "format": "<!-- Temperature Chart Template -->\n<div class=\"chart-container temperature-chart\">\n    <h3 class=\"chart-title\">🌡️ Temperature Trend</h3>\n    <div class=\"chart-wrapper\">\n        <canvas id=\"tempChart\" width=\"200\" height=\"800\"></canvas>\n    </div>\n</div>\n\n<style>\n    .chart-container {\n        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n        border-radius: 20px;\n        padding: 25px;\n        margin: 20px 0;\n        box-shadow:\n            0 10px 30px rgba(0, 255, 136, 0.1),\n            inset 0 1px 0 rgba(255, 255, 255, 0.1);\n        border: 1px solid rgba(0, 255, 136, 0.3);\n        position: relative;\n        overflow: hidden;\n        font-family: 'Orbitron', monospace;\n    }\n\n    .chart-container::before {\n        content: '';\n        position: absolute;\n        top: 0;\n        left: -100%;\n        width: 100%;\n        height: 100%;\n        background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);\n        animation: shimmer 3s infinite;\n    }\n\n    @keyframes shimmer {\n        0% {\n            left: -100%;\n        }\n\n        100% {\n            left: 100%;\n        }\n    }\n\n    .chart-title {\n        text-align: center;\n        font-size: 1.1rem;\n        font-weight: 700;\n        margin-bottom: 20px;\n        color: #00ff88;\n        text-transform: uppercase;\n        letter-spacing: 1px;\n    }\n\n    .chart-wrapper {\n        position: relative;\n        height: 200px;\n        background: rgba(0, 0, 0, 0.3);\n        border-radius: 10px;\n        padding: 10px;\n    }\n\n    canvas {\n        width: 100% !important;\n        height: 100% !important;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    var tempData = [];\n    var maxDataPoints = 20;\n    var chart;\n    \n    function initChart() {\n        var canvas = document.getElementById('tempChart');\n        if (!canvas) return;\n        \n        var ctx = canvas.getContext('2d');\n        \n        // Set canvas size\n        canvas.width = 400;\n        canvas.height = 200;\n        \n        chart = {\n            canvas: canvas,\n            ctx: ctx,\n            data: [],\n            labels: []\n        };\n        \n        drawChart();\n    }\n    \n    function drawChart() {\n        if (!chart) return;\n        \n        var ctx = chart.ctx;\n        var canvas = chart.canvas;\n        var width = canvas.width;\n        var height = canvas.height;\n        \n        // Clear canvas\n        ctx.clearRect(0, 0, width, height);\n        \n        if (tempData.length === 0) return;\n        \n        // Calculate scales\n        var minTemp = Math.min(...tempData);\n        var maxTemp = Math.max(...tempData);\n        var tempRange = maxTemp - minTemp || 1;\n        \n        // Grid lines\n        ctx.strokeStyle = '#333';\n        ctx.lineWidth = 1;\n        \n        // Vertical grid lines\n        for (let i = 0; i <= 10; i++) {\n            let x = (width / 10) * i;\n            ctx.beginPath();\n            ctx.moveTo(x, 0);\n            ctx.lineTo(x, height);\n            ctx.stroke();\n        }\n        \n        // Horizontal grid lines\n        for (let i = 0; i <= 5; i++) {\n            let y = (height / 5) * i;\n            ctx.beginPath();\n            ctx.moveTo(0, y);\n            ctx.lineTo(width, y);\n            ctx.stroke();\n        }\n        \n        // Draw temperature line\n        if (tempData.length > 1) {\n            ctx.strokeStyle = '#ff6b35';\n            ctx.lineWidth = 3;\n            ctx.lineCap = 'round';\n            ctx.lineJoin = 'round';\n            \n            // Create gradient\n            var gradient = ctx.createLinearGradient(0, 0, 0, height);\n            gradient.addColorStop(0, 'rgba(255, 107, 53, 0.8)');\n            gradient.addColorStop(1, 'rgba(255, 107, 53, 0.2)');\n            \n            ctx.beginPath();\n            \n            for (let i = 0; i < tempData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((tempData[i] - minTemp) / tempRange) * height;\n                \n                if (i === 0) {\n                    ctx.moveTo(x, y);\n                } else {\n                    ctx.lineTo(x, y);\n                }\n            }\n            \n            ctx.stroke();\n            \n            // Fill area under curve\n            ctx.lineTo((width / (maxDataPoints - 1)) * (tempData.length - 1), height);\n            ctx.lineTo(0, height);\n            ctx.closePath();\n            ctx.fillStyle = gradient;\n            ctx.fill();\n            \n            // Draw data points\n            ctx.fillStyle = '#ffd700';\n            for (let i = 0; i < tempData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((tempData[i] - minTemp) / tempRange) * height;\n                \n                ctx.beginPath();\n                ctx.arc(x, y, 4, 0, 2 * Math.PI);\n                ctx.fill();\n                \n                // Glow effect\n                ctx.shadowColor = '#ffd700';\n                ctx.shadowBlur = 10;\n                ctx.beginPath();\n                ctx.arc(x, y, 2, 0, 2 * Math.PI);\n                ctx.fill();\n                ctx.shadowBlur = 0;\n            }\n        }\n        \n        // Draw labels\n        ctx.fillStyle = '#00ff88';\n        ctx.font = '12px Orbitron, monospace';\n        ctx.textAlign = 'center';\n        \n        // Current value\n        if (tempData.length > 0) {\n            var currentTemp = tempData[tempData.length - 1];\n            ctx.fillText(currentTemp.toFixed(1) + '°C', width - 40, 20);\n        }\n        \n        // Min/Max labels\n        ctx.textAlign = 'left';\n        ctx.fillText('Max: ' + maxTemp.toFixed(1) + '°C', 10, 20);\n        ctx.fillText('Min: ' + minTemp.toFixed(1) + '°C', 10, height - 10);\n    }\n    \n    function updateChart(newValue) {\n        tempData.push(parseFloat(newValue));\n        \n        // Keep only last maxDataPoints\n        if (tempData.length > maxDataPoints) {\n            tempData.shift();\n        }\n        \n        drawChart();\n    }\n    \n    // Initialize chart when template loads\n    setTimeout(initChart, 100);\n    \n    // Watch for new messages\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            updateChart(data.payload);\n        }\n    });\n    \n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1070,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8146bdca361b2415",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Humidity Chart",
+        "order": 7,
+        "width": 7,
+        "height": 6,
+        "format": "<!-- Humidity Chart Template -->\n<div class=\"chart-container humidity-chart\">\n    <h3 class=\"chart-title\">💧 Humidity Trend</h3>\n    <div class=\"chart-wrapper\">\n        <canvas id=\"humidityChart\" width=\"200\" height=\"200\"></canvas>\n    </div>\n</div>\n\n<style>\n    .chart-container {\n        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n        border-radius: 20px;\n        padding: 25px;\n        margin: 20px 0;\n        box-shadow:\n            0 10px 30px rgba(98, 160, 234, 0.1),\n            inset 0 1px 0 rgba(255, 255, 255, 0.1);\n        border: 1px solid rgba(98, 160, 234, 0.3);\n        position: relative;\n        overflow: hidden;\n        font-family: 'Orbitron', monospace;\n    }\n\n    .chart-container::before {\n        content: '';\n        position: absolute;\n        top: 0;\n        left: -100%;\n        width: 100%;\n        height: 100%;\n        background: linear-gradient(90deg, transparent, rgba(98, 160, 234, 0.1), transparent);\n        animation: shimmer 3s infinite;\n    }\n\n    @keyframes shimmer {\n        0% {\n            left: -100%;\n        }\n\n        100% {\n            left: 100%;\n        }\n    }\n\n    .chart-title {\n        text-align: center;\n        font-size: 1.1rem;\n        font-weight: 700;\n        margin-bottom: 20px;\n        color: #62a0ea;\n        text-transform: uppercase;\n        letter-spacing: 1px;\n    }\n\n    .chart-wrapper {\n        position: relative;\n        height: 200px;\n        background: rgba(0, 0, 0, 0.3);\n        border-radius: 10px;\n        padding: 10px;\n    }\n\n    canvas {\n        width: 100% !important;\n        height: 100% !important;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    var humidityData = [];\n    var maxDataPoints = 20;\n    var chart;\n    \n    function initChart() {\n        var canvas = document.getElementById('humidityChart');\n        if (!canvas) return;\n        \n        var ctx = canvas.getContext('2d');\n        \n        // Set canvas size\n        canvas.width = 400;\n        canvas.height = 200;\n        \n        chart = {\n            canvas: canvas,\n            ctx: ctx,\n            data: [],\n            labels: []\n        };\n        \n        drawChart();\n    }\n    \n    function drawChart() {\n        if (!chart) return;\n        \n        var ctx = chart.ctx;\n        var canvas = chart.canvas;\n        var width = canvas.width;\n        var height = canvas.height;\n        \n        // Clear canvas\n        ctx.clearRect(0, 0, width, height);\n        \n        if (humidityData.length === 0) return;\n        \n        // Calculate scales (humidity is typically 0-100%)\n        var minHumidity = Math.min(...humidityData);\n        var maxHumidity = Math.max(...humidityData);\n        var humidityRange = maxHumidity - minHumidity || 1;\n        \n        // Grid lines\n        ctx.strokeStyle = '#333';\n        ctx.lineWidth = 1;\n        \n        // Vertical grid lines\n        for (let i = 0; i <= 10; i++) {\n            let x = (width / 10) * i;\n            ctx.beginPath();\n            ctx.moveTo(x, 0);\n            ctx.lineTo(x, height);\n            ctx.stroke();\n        }\n        \n        // Horizontal grid lines\n        for (let i = 0; i <= 5; i++) {\n            let y = (height / 5) * i;\n            ctx.beginPath();\n            ctx.moveTo(0, y);\n            ctx.lineTo(width, y);\n            ctx.stroke();\n        }\n        \n        // Draw humidity line\n        if (humidityData.length > 1) {\n            ctx.strokeStyle = '#62a0ea';\n            ctx.lineWidth = 3;\n            ctx.lineCap = 'round';\n            ctx.lineJoin = 'round';\n            \n            // Create gradient\n            var gradient = ctx.createLinearGradient(0, 0, 0, height);\n            gradient.addColorStop(0, 'rgba(98, 160, 234, 0.8)');\n            gradient.addColorStop(1, 'rgba(98, 160, 234, 0.2)');\n            \n            ctx.beginPath();\n            \n            for (let i = 0; i < humidityData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((humidityData[i] - minHumidity) / humidityRange) * height;\n                \n                if (i === 0) {\n                    ctx.moveTo(x, y);\n                } else {\n                    ctx.lineTo(x, y);\n                }\n            }\n            \n            ctx.stroke();\n            \n            // Fill area under curve\n            ctx.lineTo((width / (maxDataPoints - 1)) * (humidityData.length - 1), height);\n            ctx.lineTo(0, height);\n            ctx.closePath();\n            ctx.fillStyle = gradient;\n            ctx.fill();\n            \n            // Draw data points\n            ctx.fillStyle = '#87ceeb';\n            for (let i = 0; i < humidityData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((humidityData[i] - minHumidity) / humidityRange) * height;\n                \n                ctx.beginPath();\n                ctx.arc(x, y, 4, 0, 2 * Math.PI);\n                ctx.fill();\n                \n                // Glow effect\n                ctx.shadowColor = '#87ceeb';\n                ctx.shadowBlur = 10;\n                ctx.beginPath();\n                ctx.arc(x, y, 2, 0, 2 * Math.PI);\n                ctx.fill();\n                ctx.shadowBlur = 0;\n            }\n        }\n        \n        // Draw labels\n        ctx.fillStyle = '#62a0ea';\n        ctx.font = '12px Orbitron, monospace';\n        ctx.textAlign = 'center';\n        \n        // Current value\n        if (humidityData.length > 0) {\n            var currentHumidity = humidityData[humidityData.length - 1];\n            ctx.fillText(currentHumidity.toFixed(1) + '%', width - 40, 20);\n        }\n        \n        // Min/Max labels\n        ctx.textAlign = 'left';\n        ctx.fillText('Max: ' + maxHumidity.toFixed(1) + '%', 10, 20);\n        ctx.fillText('Min: ' + minHumidity.toFixed(1) + '%', 10, height - 10);\n    }\n    \n    function updateChart(newValue) {\n        humidityData.push(parseFloat(newValue));\n        \n        // Keep only last maxDataPoints\n        if (humidityData.length > maxDataPoints) {\n            humidityData.shift();\n        }\n        \n        drawChart();\n    }\n    \n    // Initialize chart when template loads\n    setTimeout(initChart, 100);\n    \n    // Watch for new messages\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            updateChart(data.payload);\n        }\n    });\n    \n    // // Demo data generator (remove this in production)\n    // setInterval(function() {\n    //     var demoHumidity = Math.random() * 40 + 40; // 40-80% humidity\n    //     updateChart(demoHumidity);\n    // }, 2000);\n    \n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 860,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3d92dcd7847b9202",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "5acf14ec0c638bbe",
+        "group": "ui_group_sensors",
+        "name": "Distance Chart",
+        "order": 8,
+        "width": 7,
+        "height": 6,
+        "format": "<!-- Distance Chart Template -->\n<div class=\"chart-container distance-chart\">\n    <h3 class=\"chart-title\">📏 Distance Trend</h3>\n    <div class=\"chart-wrapper\">\n        <canvas id=\"distanceChart\" width=\"200\" height=\"200\"></canvas>\n    </div>\n</div>\n\n<style>\n    .chart-container {\n        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n        border-radius: 20px;\n        padding: 25px;\n        margin: 20px 0;\n        box-shadow:\n            0 10px 30px rgba(44, 160, 44, 0.1),\n            inset 0 1px 0 rgba(255, 255, 255, 0.1);\n        border: 1px solid rgba(44, 160, 44, 0.3);\n        position: relative;\n        overflow: hidden;\n        font-family: 'Orbitron', monospace;\n    }\n\n    .chart-container::before {\n        content: '';\n        position: absolute;\n        top: 0;\n        left: -100%;\n        width: 100%;\n        height: 100%;\n        background: linear-gradient(90deg, transparent, rgba(44, 160, 44, 0.1), transparent);\n        animation: shimmer 3s infinite;\n    }\n\n    @keyframes shimmer {\n        0% {\n            left: -100%;\n        }\n\n        100% {\n            left: 100%;\n        }\n    }\n\n    .chart-title {\n        text-align: center;\n        font-size: 1.1rem;\n        font-weight: 700;\n        margin-bottom: 20px;\n        color: #2ca02c;\n        text-transform: uppercase;\n        letter-spacing: 1px;\n    }\n\n    .chart-wrapper {\n        position: relative;\n        height: 200px;\n        background: rgba(0, 0, 0, 0.3);\n        border-radius: 10px;\n        padding: 10px;\n    }\n\n    canvas {\n        width: 100% !important;\n        height: 100% !important;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    var distanceData = [];\n    var maxDataPoints = 20;\n    var chart;\n    \n    function initChart() {\n        var canvas = document.getElementById('distanceChart');\n        if (!canvas) return;\n        \n        var ctx = canvas.getContext('2d');\n        \n        // Set canvas size\n        canvas.width = 400;\n        canvas.height = 200;\n        \n        chart = {\n            canvas: canvas,\n            ctx: ctx,\n            data: [],\n            labels: []\n        };\n        \n        drawChart();\n    }\n    \n    function drawChart() {\n        if (!chart) return;\n        \n        var ctx = chart.ctx;\n        var canvas = chart.canvas;\n        var width = canvas.width;\n        var height = canvas.height;\n        \n        // Clear canvas\n        ctx.clearRect(0, 0, width, height);\n        \n        if (distanceData.length === 0) return;\n        \n        // Calculate scales (distance typically 0-200cm for ultrasonic sensors)\n        var minDistance = Math.min(...distanceData);\n        var maxDistance = Math.max(...distanceData);\n        var distanceRange = maxDistance - minDistance || 1;\n        \n        // Grid lines\n        ctx.strokeStyle = '#333';\n        ctx.lineWidth = 1;\n        \n        // Vertical grid lines\n        for (let i = 0; i <= 10; i++) {\n            let x = (width / 10) * i;\n            ctx.beginPath();\n            ctx.moveTo(x, 0);\n            ctx.lineTo(x, height);\n            ctx.stroke();\n        }\n        \n        // Horizontal grid lines\n        for (let i = 0; i <= 5; i++) {\n            let y = (height / 5) * i;\n            ctx.beginPath();\n            ctx.moveTo(0, y);\n            ctx.lineTo(width, y);\n            ctx.stroke();\n        }\n        \n        // Draw distance line\n        if (distanceData.length > 1) {\n            ctx.strokeStyle = '#2ca02c';\n            ctx.lineWidth = 3;\n            ctx.lineCap = 'round';\n            ctx.lineJoin = 'round';\n            \n            // Create gradient\n            var gradient = ctx.createLinearGradient(0, 0, 0, height);\n            gradient.addColorStop(0, 'rgba(44, 160, 44, 0.8)');\n            gradient.addColorStop(1, 'rgba(44, 160, 44, 0.2)');\n            \n            ctx.beginPath();\n            \n            for (let i = 0; i < distanceData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((distanceData[i] - minDistance) / distanceRange) * height;\n                \n                if (i === 0) {\n                    ctx.moveTo(x, y);\n                } else {\n                    ctx.lineTo(x, y);\n                }\n            }\n            \n            ctx.stroke();\n            \n            // Fill area under curve\n            ctx.lineTo((width / (maxDataPoints - 1)) * (distanceData.length - 1), height);\n            ctx.lineTo(0, height);\n            ctx.closePath();\n            ctx.fillStyle = gradient;\n            ctx.fill();\n            \n            // Draw data points with proximity-based colors\n            for (let i = 0; i < distanceData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((distanceData[i] - minDistance) / distanceRange) * height;\n                \n                // Color coding: Red for close (< 20cm), Yellow for medium (20-50cm), Green for far (> 50cm)\n                var distance = distanceData[i];\n                var pointColor = '#90ee90'; // Light green (default)\n                if (distance < 20) {\n                    pointColor = '#ff6b6b'; // Red for close objects\n                } else if (distance < 50) {\n                    pointColor = '#ffd700'; // Gold for medium distance\n                }\n                \n                ctx.fillStyle = pointColor;\n                ctx.beginPath();\n                ctx.arc(x, y, 4, 0, 2 * Math.PI);\n                ctx.fill();\n                \n                // Glow effect\n                ctx.shadowColor = pointColor;\n                ctx.shadowBlur = 10;\n                ctx.beginPath();\n                ctx.arc(x, y, 2, 0, 2 * Math.PI);\n                ctx.fill();\n                ctx.shadowBlur = 0;\n            }\n        }\n        \n        // Draw labels\n        ctx.fillStyle = '#2ca02c';\n        ctx.font = '12px Orbitron, monospace';\n        ctx.textAlign = 'center';\n        \n        // Current value with status\n        if (distanceData.length > 0) {\n            var currentDistance = distanceData[distanceData.length - 1];\n            var status = '';\n            var statusColor = '#2ca02c';\n            \n            if (currentDistance < 20) {\n                status = ' (CLOSE)';\n                statusColor = '#ff6b6b';\n            } else if (currentDistance < 50) {\n                status = ' (MEDIUM)';\n                statusColor = '#ffd700';\n            } else {\n                status = ' (FAR)';\n                statusColor = '#90ee90';\n            }\n            \n            ctx.fillStyle = statusColor;\n            ctx.fillText(currentDistance.toFixed(1) + 'cm' + status, width - 70, 20);\n        }\n        \n        // Min/Max labels\n        ctx.fillStyle = '#2ca02c';\n        ctx.textAlign = 'left';\n        ctx.fillText('Max: ' + maxDistance.toFixed(1) + 'cm', 10, 20);\n        ctx.fillText('Min: ' + minDistance.toFixed(1) + 'cm', 10, height - 10);\n        \n        // Distance zones legend\n        ctx.font = '10px Orbitron, monospace';\n        ctx.textAlign = 'right';\n        ctx.fillStyle = '#ff6b6b';\n        ctx.fillText('● Close (<20cm)', width - 10, height - 40);\n        ctx.fillStyle = '#ffd700';\n        ctx.fillText('● Medium (20-50cm)', width - 10, height - 25);\n        ctx.fillStyle = '#90ee90';\n        ctx.fillText('● Far (>50cm)', width - 10, height - 10);\n    }\n    \n    function updateChart(newValue) {\n        distanceData.push(parseFloat(newValue));\n        \n        // Keep only last maxDataPoints\n        if (distanceData.length > maxDataPoints) {\n            distanceData.shift();\n        }\n        \n        drawChart();\n    }\n    \n    // Initialize chart when template loads\n    setTimeout(initChart, 100);\n    \n    // Watch for new messages\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            updateChart(data.payload);\n        }\n    });\n    \n    // // Demo data generator (remove this in production)\n    // setInterval(function() {\n    //     var demoDistance = Math.random() * 150 + 10; // 10-160cm distance\n    //     updateChart(demoDistance);\n    // }, 2000);\n    \n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 860,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "976d15a4a6d6cc51",
+        "type": "mqtt in",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "name": "LDR Realtime",
+        "topic": "ldr_realtime_topic",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "810f9cc363994c26",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 210,
+        "y": 680,
+        "wires": [
+            [
+                "d935d26fc6a1c462"
+            ]
+        ]
+    },
+    {
+        "id": "0df5f22647f3e210",
+        "type": "inject",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "name": "Test LDR Realtime",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "ldr_realtime_topic",
+        "payload": "512",
+        "payloadType": "num",
+        "x": 240,
+        "y": 760,
+        "wires": [
+            [
+                "b46852623901ece3"
+            ]
+        ]
+    },
+    {
+        "id": "07d8f634da9fdd82",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "group": "ui_group_sensors",
+        "name": "Light Level Gauge",
+        "order": 5,
+        "width": 7,
+        "height": 5,
+        "format": "<!-- <div class=\"custom-gauge light\">\n    <h3 class=\"gauge-title\">💡 Light Level</h3>\n    <div class=\"gauge\">\n        <svg class=\"gauge-svg\" viewBox=\"0 0 200 200\">\n            <defs>\n                <linearGradient id=\"lightGradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n                    <stop offset=\"0%\" style=\"stop-color:#2c3e50\" />\n                    <stop offset=\"30%\" style=\"stop-color:#3498db\" />\n                    <stop offset=\"70%\" style=\"stop-color:#f39c12\" />\n                    <stop offset=\"100%\" style=\"stop-color:#ffd700\" />\n                </linearGradient>\n            </defs>\n            <circle class=\"gauge-bg\" cx=\"100\" cy=\"100\" r=\"85\" />\n            <circle class=\"gauge-fill\" cx=\"100\" cy=\"100\" r=\"85\" stroke-dasharray=\"0 534\" id=\"lightFill\" />\n        </svg>\n        <div class=\"gauge-value\" id=\"lightValue\">{{msg.payload}}<span class=\"gauge-unit\">lux</span></div>\n        <div class=\"gauge-indicator\" id=\"lightIndicator\"></div>\n    </div>\n</div>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            var value = parseFloat(data.payload);\n            var max = 1024; // Max LDR reading (0-1024)\n            var percentage = Math.min((value / max) * 100, 100);\n            var circumference = 534; // 2 * PI * 85\n            var strokeLength = (percentage / 100) * circumference;\n            \n            var fill = document.getElementById('lightFill');\n            var indicator = document.getElementById('lightIndicator');\n            \n            if (fill) {\n                fill.style.strokeDasharray = strokeLength + ' ' + circumference;\n            }\n            \n            if (indicator) {\n                var rotation = (percentage / 100) * 270 - 135;\n                indicator.style.transform = 'translate(-50%, -100%) rotate(' + rotation + 'deg)';\n            }\n        }\n    });\n})(scope);\n</script> -->\n\n<!-- Light Level Gauge Format -->\n<div class=\"custom-gauge light\">\n    <h3 class=\"gauge-title\">💡 Light Level</h3>\n    <div class=\"gauge\">\n        <svg class=\"gauge-svg\" viewBox=\"0 0 200 200\">\n            <defs>\n                <linearGradient id=\"lightGradient\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n                    <stop offset=\"0%\" style=\"stop-color:#2c3e50\" />\n                    <stop offset=\"30%\" style=\"stop-color:#3498db\" />\n                    <stop offset=\"70%\" style=\"stop-color:#f39c12\" />\n                    <stop offset=\"100%\" style=\"stop-color:#ffd700\" />\n                </linearGradient>\n            </defs>\n            <circle class=\"gauge-bg\" cx=\"100\" cy=\"100\" r=\"85\" />\n            <circle class=\"gauge-fill\" cx=\"100\" cy=\"100\" r=\"85\" stroke-dasharray=\"0 534\" id=\"lightFill\" />\n        </svg>\n        <div class=\"gauge-value\" id=\"lightValue\">{{msg.payload}}<span class=\"gauge-unit\">lux</span></div>\n        <div class=\"gauge-indicator\" id=\"lightIndicator\"></div>\n    </div>\n    <div class=\"status-indicator\" id=\"lightStatus\">\n        <span class=\"status-text\" id=\"lightStatusText\">Normal</span>\n        <div class=\"status-bar\" id=\"lightStatusBar\"></div>\n    </div>\n</div>\n\n<style>\n    .status-indicator {\n        margin-top: 10px;\n        text-align: center;\n    }\n\n    .status-text {\n        font-weight: bold;\n        font-size: 14px;\n        display: block;\n        margin-bottom: 5px;\n    }\n\n    .status-bar {\n        height: 6px;\n        border-radius: 3px;\n        margin: 0 auto;\n        width: 80%;\n        transition: background-color 0.3s ease;\n    }\n\n    .status-dark {\n        background-color: #2c3e50;\n    }\n\n    .status-dim {\n        background-color: #3498db;\n    }\n\n    .status-normal {\n        background-color: #f39c12;\n    }\n\n    .status-bright {\n        background-color: #ffd700;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            var value = parseFloat(data.payload);\n            var max = 1024; // Max LDR reading (0-1024)\n            var percentage = Math.min((value / max) * 100, 100);\n            var circumference = 534; // 2 * PI * 85\n            var strokeLength = (percentage / 100) * circumference;\n            \n            var fill = document.getElementById('lightFill');\n            var indicator = document.getElementById('lightIndicator');\n            var statusText = document.getElementById('lightStatusText');\n            var statusBar = document.getElementById('lightStatusBar');\n            \n            if (fill) {\n                fill.style.strokeDasharray = strokeLength + ' ' + circumference;\n            }\n            \n            if (indicator) {\n                var rotation = (percentage / 100) * 270 - 135;\n                indicator.style.transform = 'translate(-50%, -100%) rotate(' + rotation + 'deg)';\n            }\n            \n            // Light level status logic\n            var status, statusClass;\n            if (value < 100) {\n                status = 'Dark';\n                statusClass = 'status-dark';\n            } else if (value >= 100 && value < 300) {\n                status = 'Dim';\n                statusClass = 'status-dim';\n            } else if (value >= 300 && value < 700) {\n                status = 'Normal';\n                statusClass = 'status-normal';\n            } else {\n                status = 'Bright';\n                statusClass = 'status-bright';\n            }\n            \n            if (statusText) {\n                statusText.textContent = status;\n                statusText.style.color = statusClass === 'status-dark' ? '#2c3e50' : \n                                       statusClass === 'status-dim' ? '#3498db' : \n                                       statusClass === 'status-normal' ? '#f39c12' : '#ffd700';\n            }\n            \n            if (statusBar) {\n                statusBar.className = 'status-bar ' + statusClass;\n            }\n        }\n    });\n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 790,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b46852623901ece3",
+        "type": "function",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "name": "Generate Test LDR Data",
+        "func": "// Generate random LDR value between 0-1024\nvar ldr = Math.round(Math.random() * 1024);\n\nmsg.payload = ldr;\nmsg.topic = \"ldr_realtime_topic\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 760,
+        "wires": [
+            [
+                "d935d26fc6a1c462"
+            ]
+        ]
+    },
+    {
+        "id": "d935d26fc6a1c462",
+        "type": "function",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "name": "Process LDR Data",
+        "func": "// Process incoming LDR data\nvar ldrValue;\n\n// Handle different data formats\nif (typeof msg.payload === 'object' && msg.payload.ldr !== undefined) {\n    // If payload is an object with ldr property\n    ldrValue = msg.payload.ldr;\n} else if (typeof msg.payload === 'number') {\n    // If payload is directly a number\n    ldrValue = msg.payload;\n} else {\n    // Try to parse as number\n    ldrValue = parseFloat(msg.payload) || 0;\n}\n\n// Ensure value is within valid range\nldrValue = Math.max(0, Math.min(1024, ldrValue));\n\n// Create output message\nvar outputMsg = {\n    payload: ldrValue,\n    topic: \"light\",\n    timestamp: new Date().toISOString()\n};\n\nreturn outputMsg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 680,
+        "wires": [
+            [
+                "07d8f634da9fdd82",
+                "8f65b40b22503db8"
+            ]
+        ]
+    },
+    {
+        "id": "8f65b40b22503db8",
+        "type": "ui_template",
+        "z": "main_flow",
+        "g": "af670946a1db9987",
+        "group": "ui_group_sensors",
+        "name": "Light Level Trend",
+        "order": 9,
+        "width": 7,
+        "height": 6,
+        "format": "<!-- Light Level Chart Template -->\n<div class=\"chart-container light-chart\">\n    <h3 class=\"chart-title\">💡 Light Level Trend</h3>\n    <div class=\"chart-wrapper\">\n        <canvas id=\"lightChart\" width=\"200\" height=\"200\"></canvas>\n    </div>\n</div>\n\n<style>\n    .chart-container {\n        background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n        border-radius: 20px;\n        padding: 25px;\n        margin: 20px 0;\n        box-shadow:\n            0 10px 30px rgba(255, 215, 0, 0.1),\n            inset 0 1px 0 rgba(255, 255, 255, 0.1);\n        border: 1px solid rgba(255, 215, 0, 0.3);\n        position: relative;\n        overflow: hidden;\n        font-family: 'Orbitron', monospace;\n    }\n\n    .chart-container::before {\n        content: '';\n        position: absolute;\n        top: 0;\n        left: -100%;\n        width: 100%;\n        height: 100%;\n        background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);\n        animation: shimmer 3s infinite;\n    }\n\n    @keyframes shimmer {\n        0% {\n            left: -100%;\n        }\n\n        100% {\n            left: 100%;\n        }\n    }\n\n    .chart-title {\n        text-align: center;\n        font-size: 1.1rem;\n        font-weight: 700;\n        margin-bottom: 20px;\n        color: #ffd700;\n        text-transform: uppercase;\n        letter-spacing: 1px;\n    }\n\n    .chart-wrapper {\n        position: relative;\n        height: 200px;\n        background: rgba(0, 0, 0, 0.3);\n        border-radius: 10px;\n        padding: 10px;\n    }\n\n    canvas {\n        width: 100% !important;\n        height: 100% !important;\n    }\n</style>\n\n<script>\n    (function(scope) {\n    var lightData = [];\n    var maxDataPoints = 20;\n    var chart;\n    \n    function initChart() {\n        var canvas = document.getElementById('lightChart');\n        if (!canvas) return;\n        \n        var ctx = canvas.getContext('2d');\n        \n        // Set canvas size\n        canvas.width = 400;\n        canvas.height = 200;\n        \n        chart = {\n            canvas: canvas,\n            ctx: ctx,\n            data: [],\n            labels: []\n        };\n        \n        drawChart();\n    }\n    \n    function drawChart() {\n        if (!chart) return;\n        \n        var ctx = chart.ctx;\n        var canvas = chart.canvas;\n        var width = canvas.width;\n        var height = canvas.height;\n        \n        // Clear canvas\n        ctx.clearRect(0, 0, width, height);\n        \n        if (lightData.length === 0) return;\n        \n        // Calculate scales (LDR typically 0-1024)\n        var minLight = Math.min(...lightData);\n        var maxLight = Math.max(...lightData);\n        var lightRange = maxLight - minLight || 1;\n        \n        // Grid lines\n        ctx.strokeStyle = '#333';\n        ctx.lineWidth = 1;\n        \n        // Vertical grid lines\n        for (let i = 0; i <= 10; i++) {\n            let x = (width / 10) * i;\n            ctx.beginPath();\n            ctx.moveTo(x, 0);\n            ctx.lineTo(x, height);\n            ctx.stroke();\n        }\n        \n        // Horizontal grid lines\n        for (let i = 0; i <= 5; i++) {\n            let y = (height / 5) * i;\n            ctx.beginPath();\n            ctx.moveTo(0, y);\n            ctx.lineTo(width, y);\n            ctx.stroke();\n        }\n        \n        // Draw light level line\n        if (lightData.length > 1) {\n            ctx.strokeStyle = '#ffd700';\n            ctx.lineWidth = 3;\n            ctx.lineCap = 'round';\n            ctx.lineJoin = 'round';\n            \n            // Create gradient based on light level\n            var gradient = ctx.createLinearGradient(0, 0, 0, height);\n            gradient.addColorStop(0, 'rgba(255, 215, 0, 0.8)');\n            gradient.addColorStop(0.5, 'rgba(255, 165, 0, 0.6)');\n            gradient.addColorStop(1, 'rgba(255, 69, 0, 0.4)');\n            \n            ctx.beginPath();\n            \n            for (let i = 0; i < lightData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((lightData[i] - minLight) / lightRange) * height;\n                \n                if (i === 0) {\n                    ctx.moveTo(x, y);\n                } else {\n                    ctx.lineTo(x, y);\n                }\n            }\n            \n            ctx.stroke();\n            \n            // Fill area under curve\n            ctx.lineTo((width / (maxDataPoints - 1)) * (lightData.length - 1), height);\n            ctx.lineTo(0, height);\n            ctx.closePath();\n            ctx.fillStyle = gradient;\n            ctx.fill();\n            \n            // Draw data points with light-level based colors\n            for (let i = 0; i < lightData.length; i++) {\n                let x = (width / (maxDataPoints - 1)) * i;\n                let y = height - ((lightData[i] - minLight) / lightRange) * height;\n                \n                // Color coding: Dark blue for low light (< 200), Orange for medium (200-600), Bright yellow for high (> 600)\n                var lightLevel = lightData[i];\n                var pointColor = '#ffd700'; // Gold (default)\n                if (lightLevel < 200) {\n                    pointColor = '#4169e1'; // Royal blue for low light\n                } else if (lightLevel < 600) {\n                    pointColor = '#ff8c00'; // Dark orange for medium light\n                } else {\n                    pointColor = '#ffff00'; // Bright yellow for high light\n                }\n                \n                ctx.fillStyle = pointColor;\n                ctx.beginPath();\n                ctx.arc(x, y, 4, 0, 2 * Math.PI);\n                ctx.fill();\n                \n                // Glow effect\n                ctx.shadowColor = pointColor;\n                ctx.shadowBlur = 10;\n                ctx.beginPath();\n                ctx.arc(x, y, 2, 0, 2 * Math.PI);\n                ctx.fill();\n                ctx.shadowBlur = 0;\n            }\n        }\n        \n        // Draw labels\n        ctx.fillStyle = '#ffd700';\n        ctx.font = '12px Orbitron, monospace';\n        ctx.textAlign = 'center';\n        \n        // Current value with status\n        if (lightData.length > 0) {\n            var currentLight = lightData[lightData.length - 1];\n            var status = '';\n            var statusColor = '#ffd700';\n            \n            if (currentLight < 200) {\n                status = ' (DARK)';\n                statusColor = '#4169e1';\n            } else if (currentLight < 600) {\n                status = ' (DIM)';\n                statusColor = '#ff8c00';\n            } else {\n                status = ' (BRIGHT)';\n                statusColor = '#ffff00';\n            }\n            \n            ctx.fillStyle = statusColor;\n            ctx.fillText(Math.round(currentLight) + ' lux' + status, width - 70, 20);\n        }\n        \n        // Min/Max labels\n        ctx.fillStyle = '#ffd700';\n        ctx.textAlign = 'left';\n        ctx.fillText('Max: ' + Math.round(maxLight) + ' lux', 10, 20);\n        ctx.fillText('Min: ' + Math.round(minLight) + ' lux', 10, height - 10);\n        \n        // Light level zones legend\n        ctx.font = '10px Orbitron, monospace';\n        ctx.textAlign = 'right';\n        ctx.fillStyle = '#4169e1';\n        ctx.fillText('● Dark (<200)', width - 10, height - 40);\n        ctx.fillStyle = '#ff8c00';\n        ctx.fillText('● Dim (200-600)', width - 10, height - 25);\n        ctx.fillStyle = '#ffff00';\n        ctx.fillText('● Bright (>600)', width - 10, height - 10);\n    }\n    \n    function updateChart(newValue) {\n        lightData.push(parseFloat(newValue));\n        \n        // Keep only last maxDataPoints\n        if (lightData.length > maxDataPoints) {\n            lightData.shift();\n        }\n        \n        drawChart();\n    }\n    \n    // Initialize chart when template loads\n    setTimeout(initChart, 100);\n    \n    // Watch for new messages\n    scope.$watch('msg', function(data) {\n        if (data && data.payload !== undefined) {\n            updateChart(data.payload);\n        }\n    });\n    \n    // // Demo data generator (remove this in production)\n    // setInterval(function() {\n    //     var demoLight = Math.random() * 1024; // 0-1024 LDR range\n    //     updateChart(demoLight);\n    // }, 2000);\n    \n})(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 790,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "mysql_config",
+        "type": "MySQLdatabase",
+        "name": "Sensor Database",
+        "host": "localhost",
+        "port": "3306",
+        "db": "sensor_monitoring",
+        "tz": "UTC",
+        "charset": "UTF8_GENERAL_CI"
+    },
+    {
+        "id": "810f9cc363994c26",
+        "type": "mqtt-broker",
+        "name": "emqx",
+        "broker": "broker.emqx.io",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "ui_group_sensors",
+        "type": "ui_group",
+        "name": "Sensor Data",
+        "tab": "ui_tab_main",
+        "order": 1,
+        "disp": true,
+        "width": 28,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "ui_tab_main",
+        "type": "ui_tab",
+        "name": "Real-time Monitor",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
