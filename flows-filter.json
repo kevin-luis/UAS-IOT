@@ -1,0 +1,135 @@
+[
+    {
+        "id": "8c855d5e2a227724",
+        "type": "tab",
+        "label": "Filter Dashboard",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "63445a80788687a1",
+        "type": "mysql",
+        "z": "8c855d5e2a227724",
+        "mydb": "mysql_config",
+        "name": "",
+        "x": 650,
+        "y": 560,
+        "wires": [
+            [
+                "b7dbf9586b9e0b16"
+            ]
+        ]
+    },
+    {
+        "id": "6ab36c26c3bbd8c9",
+        "type": "debug",
+        "z": "8c855d5e2a227724",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "0edf28dee71b36cc",
+        "type": "ui_template",
+        "z": "8c855d5e2a227724",
+        "group": "26c8524b1cea6302",
+        "name": "Filter Controls",
+        "order": 1,
+        "width": 18,
+        "height": 3,
+        "format": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        .filter-container {\n            padding: 20px;\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            border-radius: 15px;\n            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);\n            margin: 10px 0;\n        }\n\n        .filter-header {\n            text-align: center;\n            color: white;\n            margin-bottom: 20px;\n            font-size: 20px;\n            font-weight: bold;\n            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\n        }\n\n        .filter-form {\n            display: flex;\n            gap: 15px;\n            align-items: end;\n            flex-wrap: wrap;\n            justify-content: center;\n        }\n\n        .form-group {\n            display: flex;\n            flex-direction: column;\n            min-width: 150px;\n        }\n\n        .form-group label {\n            color: white;\n            margin-bottom: 5px;\n            font-weight: 600;\n            font-size: 14px;\n        }\n\n        .form-group input,\n        .form-group select {\n            padding: 10px 12px;\n            border: none;\n            border-radius: 8px;\n            font-size: 14px;\n            background: rgba(255, 255, 255, 0.9);\n            color: #2c3e50;\n            transition: all 0.3s ease;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n        }\n\n        .form-group input:focus,\n        .form-group select:focus {\n            outline: none;\n            background: white;\n            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);\n            transform: translateY(-2px);\n        }\n\n        .filter-button {\n            padding: 12px 25px;\n            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n            color: white;\n            border: none;\n            border-radius: 8px;\n            font-size: 14px;\n            font-weight: 600;\n            cursor: pointer;\n            transition: all 0.3s ease;\n            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);\n        }\n\n        .filter-button:hover {\n            transform: translateY(-2px);\n            box-shadow: 0 6px 25px rgba(79, 172, 254, 0.5);\n        }\n\n        .filter-button:active {\n            transform: translateY(0);\n        }\n\n        @media (max-width: 768px) {\n            .filter-form {\n                flex-direction: column;\n                align-items: stretch;\n            }\n            \n            .form-group {\n                min-width: auto;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"filter-container\">\n        <div class=\"filter-header\">\n            🔍 Sensor Data Filter\n        </div>\n        \n        <div class=\"filter-form\">\n            <div class=\"form-group\">\n                <label for=\"sensor-select\">📡 Select Sensor</label>\n                <select id=\"sensor-select\" ng-model=\"selectedSensor\">\n                    <option value=\"dht\">🌡️ Sensor DHT (Temp & Humidity)</option>\n                    <option value=\"ping\">📏 Sensor PING (Distance)</option>\n                    <option value=\"ldr\">💡 Sensor LDR (Light Level)</option>\n                </select>\n            </div>\n            \n            <div class=\"form-group\">\n                <label for=\"start-date\">📅 Start Date</label>\n                <input type=\"date\" id=\"start-date\" ng-model=\"startDate\" required>\n            </div>\n            \n            <div class=\"form-group\">\n                <label for=\"end-date\">📅 End Date</label>\n                <input type=\"date\" id=\"end-date\" ng-model=\"endDate\" required>\n            </div>\n            \n            <div class=\"form-group\">\n                <button class=\"filter-button\" ng-click=\"applyFilter()\">\n                    🔍 Apply Filter\n                </button>\n            </div>\n        </div>\n    </div>\n\n    <script>\n        // Initialize default values\n        this.scope.selectedSensor = 'dht';\n        this.scope.startDate = '';\n        this.scope.endDate = '';\n\n        // Function to apply filter\n        this.scope.applyFilter = function() {\n            if (!this.startDate || !this.endDate) {\n                alert('Please select both start and end dates');\n                return;\n            }\n            \n            if (new Date(this.startDate) > new Date(this.endDate)) {\n                alert('Start date must be before end date');\n                return;\n            }\n\n            // Send data to Node-RED\n            this.send({\n                payload: {\n                    sensor: this.selectedSensor,\n                    startDate: this.startDate,\n                    endDate: this.endDate\n                }\n            });\n        };\n    </script>\n</body>\n</html>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "b6372f50baf004af"
+            ]
+        ]
+    },
+    {
+        "id": "b6372f50baf004af",
+        "type": "function",
+        "z": "8c855d5e2a227724",
+        "name": "Query Builder",
+        "func": "// Format tanggal dari form input ke format MySQL date range\nfunction formatDateForMySQL(dateString, isEndDate = false) {\n    const date = new Date(dateString);\n    if (isEndDate) {\n        // Untuk end date, set ke akhir hari (23:59:59)\n        date.setHours(23, 59, 59, 999);\n    } else {\n        // Untuk start date, set ke awal hari (00:00:00)\n        date.setHours(0, 0, 0, 0);\n    }\n    return date.toISOString().slice(0, 19).replace('T', ' ');\n}\n\n// Ambil data dari payload\nconst sensorType = msg.payload.sensor;\nconst startDate = msg.payload.startDate;\nconst endDate = msg.payload.endDate;\n\n// Format tanggal untuk query MySQL\nconst formattedStartDate = formatDateForMySQL(startDate, false);\nconst formattedEndDate = formatDateForMySQL(endDate, true);\n\nlet sqlQuery = '';\nlet tableName = '';\nlet selectFields = '';\n\n// Tentukan table dan field berdasarkan sensor yang dipilih\nswitch (sensorType) {\n    case 'dht':\n        tableName = 'dht_data';\n        selectFields = `\n            id,\n            DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:%s') as formatted_timestamp,\n            timestamp,\n            temperature,\n            humidity`;\n        break;\n\n    case 'ping':\n        tableName = 'ping_data';\n        selectFields = `\n            id,\n            DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:%s') as formatted_timestamp,\n            timestamp,\n            distance`;\n        break;\n\n    case 'ldr':\n        tableName = 'ldr_data';\n        selectFields = `\n            id,\n            DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:%s') as formatted_timestamp,\n            timestamp,\n            light_level`;\n        break;\n\n    default:\n        node.error('Invalid sensor type: ' + sensorType);\n        return null;\n}\n\n// Buat query SQL (urutan dari yang paling lama ke yang terbaru)\nsqlQuery = `\n    SELECT ${selectFields}\n    FROM ${tableName} \n    WHERE DATE(timestamp) BETWEEN DATE('${startDate}') AND DATE('${endDate}')\n    ORDER BY timestamp ASC\n`;\n\n// Set query ke topic untuk dikirim ke MySQL node\nmsg.topic = sqlQuery;\n\n// Tambahkan informasi sensor type untuk digunakan di table template\nmsg.sensorType = sensorType;\nmsg.tableName = tableName;\n\n// Log untuk debugging\nnode.log(`Sensor: ${sensorType}`);\nnode.log(`Table: ${tableName}`);\nnode.log(`Query: ${sqlQuery}`);\nnode.log(`Date Range: ${startDate} to ${endDate}`);\nnode.log(`MySQL Date Range: ${formattedStartDate} to ${formattedEndDate}`);\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 440,
+        "wires": [
+            [
+                "63445a80788687a1",
+                "6ab36c26c3bbd8c9"
+            ]
+        ]
+    },
+    {
+        "id": "b7dbf9586b9e0b16",
+        "type": "ui_template",
+        "z": "8c855d5e2a227724",
+        "group": "26c8524b1cea6302",
+        "name": "Data Table",
+        "order": 2,
+        "width": 18,
+        "height": 13,
+        "format": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        .sensor-table-container {\n            padding: 20px;\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            border-radius: 15px;\n            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);\n            margin: 10px 0;\n            height: 100%;\n            display: flex;\n            flex-direction: column;\n        }\n\n        .table-header {\n            text-align: center;\n            color: white;\n            margin-bottom: 20px;\n            font-size: 24px;\n            font-weight: bold;\n            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);\n            flex-shrink: 0;\n        }\n\n        /* Stats cards - tidak akan di-scroll */\n        .stats-container {\n            display: flex;\n            gap: 15px;\n            margin-bottom: 20px;\n            flex-wrap: wrap;\n            flex-shrink: 0;\n        }\n\n        .stat-card {\n            flex: 1;\n            min-width: 120px;\n            background: rgba(255, 255, 255, 0.2);\n            border-radius: 10px;\n            padding: 15px;\n            text-align: center;\n            color: white;\n            backdrop-filter: blur(10px);\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n\n        .stat-value {\n            font-size: 24px;\n            font-weight: bold;\n            margin-bottom: 5px;\n        }\n\n        .stat-label {\n            font-size: 12px;\n            opacity: 0.8;\n            text-transform: uppercase;\n            letter-spacing: 1px;\n        }\n\n        /* Container untuk tabel yang dapat di-scroll */\n        .table-scroll-container {\n            flex: 1;\n            overflow-y: auto;\n            max-height: 400px;\n            border-radius: 12px;\n            background: white;\n            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);\n        }\n\n        .sensor-table {\n            width: 100%;\n            border-collapse: collapse;\n            background: white;\n        }\n\n        .sensor-table thead {\n            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\n            color: white;\n            position: sticky;\n            top: 0;\n            z-index: 10;\n        }\n\n        .sensor-table th {\n            padding: 18px 15px;\n            text-align: left;\n            font-weight: 600;\n            font-size: 14px;\n            text-transform: uppercase;\n            letter-spacing: 1px;\n            border-bottom: 3px solid #2980b9;\n        }\n\n        .sensor-table td {\n            padding: 15px;\n            border-bottom: 1px solid #e8e9ea;\n            font-size: 14px;\n            color: #2c3e50;\n            transition: all 0.3s ease;\n        }\n\n        .sensor-table tbody tr {\n            transition: all 0.3s ease;\n        }\n\n        .sensor-table tbody tr:hover {\n            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);\n            color: white;\n            transform: scale(1.01);\n            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);\n        }\n\n        .sensor-table tbody tr:nth-child(even) {\n            background: #f8f9fa;\n        }\n\n        .sensor-table tbody tr:nth-child(odd) {\n            background: white;\n        }\n\n        /* Styling untuk kolom khusus */\n        .temperature-cell {\n            font-weight: bold;\n            color: #e74c3c;\n        }\n\n        .humidity-cell {\n            font-weight: bold;\n            color: #3498db;\n        }\n\n        .distance-cell {\n            font-weight: bold;\n            color: #f39c12;\n        }\n\n        .light-cell {\n            font-weight: bold;\n            color: #f1c40f;\n        }\n\n        .timestamp-cell {\n            font-family: 'Courier New', monospace;\n            color: #7f8c8d;\n        }\n\n        .id-cell {\n            font-weight: bold;\n            color: #9b59b6;\n            text-align: center;\n        }\n\n        /* Scrollbar styling */\n        .table-scroll-container::-webkit-scrollbar {\n            width: 8px;\n        }\n\n        .table-scroll-container::-webkit-scrollbar-track {\n            background: #f1f1f1;\n            border-radius: 10px;\n        }\n\n        .table-scroll-container::-webkit-scrollbar-thumb {\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n            border-radius: 10px;\n        }\n\n        .table-scroll-container::-webkit-scrollbar-thumb:hover {\n            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);\n        }\n\n        /* Responsive design */\n        @media (max-width: 768px) {\n            .sensor-table-container {\n                padding: 10px;\n                margin: 5px 0;\n            }\n\n            .sensor-table th,\n            .sensor-table td {\n                padding: 10px 8px;\n                font-size: 12px;\n            }\n\n            .table-header {\n                font-size: 18px;\n                margin-bottom: 15px;\n            }\n\n            .table-scroll-container {\n                max-height: 300px;\n            }\n        }\n\n        /* Loading state */\n        .loading {\n            text-align: center;\n            padding: 40px;\n            color: white;\n            font-size: 18px;\n        }\n\n        /* No data state */\n        .no-data {\n            text-align: center;\n            padding: 40px;\n            color: #7f8c8d;\n            font-style: italic;\n            font-size: 16px;\n            background: white;\n            border-radius: 12px;\n        }\n    </style>\n</head>\n\n<body>\n    <div class=\"sensor-table-container\">\n        <div class=\"table-header\">\n            📊 {{ getSensorTitle() }} Data\n        </div>\n\n        <div class=\"stats-container\" ng-if=\"msg.payload && msg.payload.length > 0\">\n            <div class=\"stat-card\">\n                <div class=\"stat-value\">{{msg.payload.length}}</div>\n                <div class=\"stat-label\">Total Records</div>\n            </div>\n            <div class=\"stat-card\" ng-if=\"msg.sensorType === 'dht'\">\n                <div class=\"stat-value\">{{getAvgTemp()}}</div>\n                <div class=\"stat-label\">Avg Temp (°C)</div>\n            </div>\n            <div class=\"stat-card\" ng-if=\"msg.sensorType === 'dht'\">\n                <div class=\"stat-value\">{{getAvgHumidity()}}</div>\n                <div class=\"stat-label\">Avg Humidity (%)</div>\n            </div>\n            <div class=\"stat-card\" ng-if=\"msg.sensorType === 'ping'\">\n                <div class=\"stat-value\">{{getAvgDistance()}}</div>\n                <div class=\"stat-label\">Avg Distance (cm)</div>\n            </div>\n            <div class=\"stat-card\" ng-if=\"msg.sensorType === 'ldr'\">\n                <div class=\"stat-value\">{{getAvgLight()}}</div>\n                <div class=\"stat-label\">Avg Light Level</div>\n            </div>\n        </div>\n\n        <div ng-if=\"!msg.payload\" class=\"loading\">\n            ⏳ Loading data...\n        </div>\n\n        <div ng-if=\"msg.payload && msg.payload.length === 0\" class=\"no-data\">\n            📭 No data found for the selected date range and sensor\n        </div>\n\n        <!-- Scrollable Table Container -->\n        <div class=\"table-scroll-container\" ng-if=\"msg.payload && msg.payload.length > 0\">\n            <!-- DHT Sensor Table -->\n            <table class=\"sensor-table\" ng-if=\"msg.sensorType === 'dht'\">\n                <thead>\n                    <tr>\n                        <th>ID</th>\n                        <th>📅 Timestamp</th>\n                        <th>🌡️ Temperature (°C)</th>\n                        <th>💧 Humidity (%)</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"row in msg.payload track by $index\">\n                        <td class=\"id-cell\">{{row.id}}</td>\n                        <td class=\"timestamp-cell\">{{row.formatted_timestamp}}</td>\n                        <td class=\"temperature-cell\">{{row.temperature | number:1}}</td>\n                        <td class=\"humidity-cell\">{{row.humidity | number:1}}</td>\n                    </tr>\n                </tbody>\n            </table>\n\n            <!-- PING Sensor Table -->\n            <table class=\"sensor-table\" ng-if=\"msg.sensorType === 'ping'\">\n                <thead>\n                    <tr>\n                        <th>ID</th>\n                        <th>📅 Timestamp</th>\n                        <th>📏 Distance (cm)</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"row in msg.payload track by $index\">\n                        <td class=\"id-cell\">{{row.id}}</td>\n                        <td class=\"timestamp-cell\">{{row.formatted_timestamp}}</td>\n                        <td class=\"distance-cell\">{{row.distance | number:2}}</td>\n                    </tr>\n                </tbody>\n            </table>\n\n            <!-- LDR Sensor Table -->\n            <table class=\"sensor-table\" ng-if=\"msg.sensorType === 'ldr'\">\n                <thead>\n                    <tr>\n                        <th>ID</th>\n                        <th>📅 Timestamp</th>\n                        <th>💡 Light Level</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"row in msg.payload track by $index\">\n                        <td class=\"id-cell\">{{row.id}}</td>\n                        <td class=\"timestamp-cell\">{{row.formatted_timestamp}}</td>\n                        <td class=\"light-cell\">{{row.light_level}}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n\n    <script>\n        // Fungsi untuk menentukan judul sensor\n        this.scope.getSensorTitle = function() {\n            if (!this.msg.sensorType) return 'Sensor';\n            \n            switch(this.msg.sensorType) {\n                case 'dht': return '🌡️ DHT Sensor';\n                case 'ping': return '📏 PING Sensor';\n                case 'ldr': return '💡 LDR Sensor';\n                default: return 'Sensor';\n            }\n        };\n\n        // Fungsi untuk menghitung rata-rata temperature\n        this.scope.getAvgTemp = function() {\n            if (!this.msg.payload || this.msg.payload.length === 0) return '0';\n            const sum = this.msg.payload.reduce((acc, row) => acc + parseFloat(row.temperature || 0), 0);\n            return (sum / this.msg.payload.length).toFixed(1);\n        };\n\n        // Fungsi untuk menghitung rata-rata humidity\n        this.scope.getAvgHumidity = function() {\n            if (!this.msg.payload || this.msg.payload.length === 0) return '0';\n            const sum = this.msg.payload.reduce((acc, row) => acc + parseFloat(row.humidity || 0), 0);\n            return (sum / this.msg.payload.length).toFixed(1);\n        };\n\n        // Fungsi untuk menghitung rata-rata distance\n        this.scope.getAvgDistance = function() {\n            if (!this.msg.payload || this.msg.payload.length === 0) return '0';\n            const sum = this.msg.payload.reduce((acc, row) => acc + parseFloat(row.distance || 0), 0);\n            return (sum / this.msg.payload.length).toFixed(1);\n        };\n\n        // Fungsi untuk menghitung rata-rata light level\n        this.scope.getAvgLight = function() {\n            if (!this.msg.payload || this.msg.payload.length === 0) return '0';\n            const sum = this.msg.payload.reduce((acc, row) => acc + parseFloat(row.light_level || 0), 0);\n            return Math.round(sum / this.msg.payload.length);\n        };\n    </script>\n</body>\n</html>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 850,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "mysql_config",
+        "type": "MySQLdatabase",
+        "name": "Sensor Database",
+        "host": "localhost",
+        "port": "3306",
+        "db": "sensor_monitoring",
+        "tz": "UTC",
+        "charset": "UTF8_GENERAL_CI"
+    },
+    {
+        "id": "26c8524b1cea6302",
+        "type": "ui_group",
+        "name": "Dashboard",
+        "tab": "cd2569ab14af0da3",
+        "order": 1,
+        "disp": true,
+        "width": 18,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "cd2569ab14af0da3",
+        "type": "ui_tab",
+        "name": "Filter Data",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
