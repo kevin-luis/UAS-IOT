@@ -1,15 +1,15 @@
 [
     {
-        "id": "main_flow",
+        "id": "058bc9fa4519e909",
         "type": "tab",
         "label": "Dashboard Monitoring",
         "disabled": false,
         "info": ""
     },
     {
-        "id": "af670946a1db9987",
+        "id": "f98ed4b07f2c62f4",
         "type": "group",
-        "z": "main_flow",
+        "z": "058bc9fa4519e909",
         "style": {
             "stroke": "#999999",
             "stroke-opacity": "1",
@@ -20,22 +20,22 @@
             "color": "#a4a4a4"
         },
         "nodes": [
-            "976d15a4a6d6cc51",
-            "0df5f22647f3e210",
-            "07d8f634da9fdd82",
-            "b46852623901ece3",
-            "d935d26fc6a1c462",
-            "8f65b40b22503db8"
+            "e3f99931978106c5",
+            "67a8d0e55a6684cd",
+            "e8e74da1fb48d18a",
+            "b8d2712450ba17c7",
+            "ea991417e40d2e5f",
+            "80416184db69d91a"
         ],
         "x": 94,
-        "y": 639,
+        "y": 559,
         "w": 812,
         "h": 162
     },
     {
-        "id": "5acf14ec0c638bbe",
+        "id": "3d701a27c96bc8ee",
         "type": "group",
-        "z": "main_flow",
+        "z": "058bc9fa4519e909",
         "style": {
             "stroke": "#999999",
             "stroke-opacity": "1",
@@ -46,28 +46,28 @@
             "color": "#a4a4a4"
         },
         "nodes": [
-            "080f8598217b8bef",
-            "87ae8de1a3040408",
-            "cf3dc0f817be13d7",
-            "8968757a100422e5",
-            "020621f22bd12015",
-            "13654640e6e0a6cd",
-            "73d4dc3904338a4f",
-            "bbdb4749705da9a3",
-            "ee21352b9dd0e672",
-            "6b402f2a1f226bf5",
-            "8146bdca361b2415",
-            "3d92dcd7847b9202"
+            "8df7bdfa899e29de",
+            "b8f6f934a13e981f",
+            "cd5cf54bf5bb0131",
+            "92a820a60d6b6d84",
+            "7d34525a214c1666",
+            "908e3d8da47b5c01",
+            "0a067c6a8712da62",
+            "4f748d85ecdd34c0",
+            "584cd4e156399894",
+            "eb19625d57034e3f",
+            "63a8be4fedd4eb8c",
+            "e7442c9a3b527596"
         ],
-        "x": 74,
+        "x": 34,
         "y": 19,
-        "w": 1292,
-        "h": 342
+        "w": 1232,
+        "h": 302
     },
     {
-        "id": "79cc9a2148ecadd0",
+        "id": "aa926891565554d3",
         "type": "group",
-        "z": "main_flow",
+        "z": "058bc9fa4519e909",
         "style": {
             "stroke": "#999999",
             "stroke-opacity": "1",
@@ -78,94 +78,94 @@
             "color": "#a4a4a4"
         },
         "nodes": [
-            "store_database",
-            "store_dht",
-            "store_ping",
-            "store_ldr",
-            "db_success"
+            "ed3557f585f2c8c1",
+            "b7fccf0e822a0575",
+            "a71ca7078d123814",
+            "cddcdd4f06b338e8",
+            "b063b25bc8aff113"
         ],
-        "x": 314,
-        "y": 419,
+        "x": 254,
+        "y": 339,
         "w": 852,
         "h": 162
     },
     {
-        "id": "store_database",
+        "id": "ed3557f585f2c8c1",
         "type": "function",
-        "z": "main_flow",
-        "g": "79cc9a2148ecadd0",
+        "z": "058bc9fa4519e909",
+        "g": "aa926891565554d3",
         "name": "Prepare for Database",
-        "func": "var data = msg.payload;\nvar timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');\n\n// DHT Data\nvar msg1 = {\n    topic: \"INSERT INTO dht_data (timestamp, temperature, humidity) VALUES (?, ?, ?)\",\n    payload: [timestamp, data.temperature, data.humidity],\n    sensor_type: 'DHT'\n};\n\n// PING Data\nvar msg2 = {\n    topic: \"INSERT INTO ping_data (timestamp, distance) VALUES (?, ?)\",\n    payload: [timestamp, data.ping_distance],\n    sensor_type: 'PING'\n};\n\n// LDR Data\nvar msg3 = {\n    topic: \"INSERT INTO ldr_data (timestamp, light_level) VALUES (?, ?)\",\n    payload: [timestamp, data.ldr],\n    sensor_type: 'LDR'\n};\n\nreturn [msg1, msg2, msg3];  // 👈 perhatikan bentuk return-nya\n",
+        "func": "var data = msg.payload;\n\nvar timestamp = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' });\n\n\n// DHT Data\nvar msg1 = {\n    topic: \"INSERT INTO dht_data (timestamp, temperature, humidity) VALUES (?, ?, ?)\",\n    payload: [timestamp, data.temperature, data.humidity],\n    sensor_type: 'DHT'\n};\n\n// PING Data\nvar msg2 = {\n    topic: \"INSERT INTO ping_data (timestamp, distance) VALUES (?, ?)\",\n    payload: [timestamp, data.ping_distance],\n    sensor_type: 'PING'\n};\n\n// LDR Data\nvar msg3 = {\n    topic: \"INSERT INTO ldr_data (timestamp, light_level) VALUES (?, ?)\",\n    payload: [timestamp, data.ldr],\n    sensor_type: 'LDR'\n};\n\nreturn [msg1, msg2, msg3];",
         "outputs": 3,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 500,
+        "x": 380,
+        "y": 420,
         "wires": [
             [
-                "store_dht"
+                "b7fccf0e822a0575"
             ],
             [
-                "store_ping"
+                "a71ca7078d123814"
             ],
             [
-                "store_ldr"
+                "cddcdd4f06b338e8"
             ]
         ]
     },
     {
-        "id": "store_dht",
+        "id": "b7fccf0e822a0575",
         "type": "mysql",
-        "z": "main_flow",
-        "g": "79cc9a2148ecadd0",
+        "z": "058bc9fa4519e909",
+        "g": "aa926891565554d3",
         "mydb": "mysql_config",
         "name": "Store DHT Data",
-        "x": 760,
+        "x": 700,
+        "y": 380,
+        "wires": [
+            [
+                "b063b25bc8aff113"
+            ]
+        ]
+    },
+    {
+        "id": "a71ca7078d123814",
+        "type": "mysql",
+        "z": "058bc9fa4519e909",
+        "g": "aa926891565554d3",
+        "mydb": "mysql_config",
+        "name": "Store PING Data",
+        "x": 710,
+        "y": 420,
+        "wires": [
+            [
+                "b063b25bc8aff113"
+            ]
+        ]
+    },
+    {
+        "id": "cddcdd4f06b338e8",
+        "type": "mysql",
+        "z": "058bc9fa4519e909",
+        "g": "aa926891565554d3",
+        "mydb": "mysql_config",
+        "name": "Store LDR Data",
+        "x": 700,
         "y": 460,
         "wires": [
             [
-                "db_success"
+                "b063b25bc8aff113"
             ]
         ]
     },
     {
-        "id": "store_ping",
-        "type": "mysql",
-        "z": "main_flow",
-        "g": "79cc9a2148ecadd0",
-        "mydb": "mysql_config",
-        "name": "Store PING Data",
-        "x": 770,
-        "y": 500,
-        "wires": [
-            [
-                "db_success"
-            ]
-        ]
-    },
-    {
-        "id": "store_ldr",
-        "type": "mysql",
-        "z": "main_flow",
-        "g": "79cc9a2148ecadd0",
-        "mydb": "mysql_config",
-        "name": "Store LDR Data",
-        "x": 760,
-        "y": 540,
-        "wires": [
-            [
-                "db_success"
-            ]
-        ]
-    },
-    {
-        "id": "db_success",
+        "id": "b063b25bc8aff113",
         "type": "debug",
-        "z": "main_flow",
-        "g": "79cc9a2148ecadd0",
+        "z": "058bc9fa4519e909",
+        "g": "aa926891565554d3",
         "name": "Database Status",
         "active": true,
         "tosidebar": true,
@@ -175,17 +175,17 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1030,
-        "y": 480,
+        "x": 970,
+        "y": 400,
         "wires": []
     },
     {
-        "id": "080f8598217b8bef",
+        "id": "8df7bdfa899e29de",
         "type": "mqtt in",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "name": "All Sensor Data",
-        "topic": "arduino_car/sensors",
+        "topic": "sensor/data_for_db",
         "qos": "2",
         "datatype": "json",
         "broker": "810f9cc363994c26",
@@ -196,16 +196,16 @@
         "y": 120,
         "wires": [
             [
-                "87ae8de1a3040408",
-                "store_database"
+                "b8f6f934a13e981f",
+                "ed3557f585f2c8c1"
             ]
         ]
     },
     {
-        "id": "87ae8de1a3040408",
+        "id": "b8f6f934a13e981f",
         "type": "function",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "name": "Split Sensor Data",
         "func": "// Extract individual sensor values from payload\nvar data = msg.payload;\n\nif (!data || typeof data !== 'object') {\n    node.error('Invalid sensor data received');\n    return null;\n}\n\n// Temperature output\nvar msg1 = {\n    payload: data.temperature || 0,\n    topic: \"temperature\",\n    timestamp: new Date().toISOString()\n};\n\n// Humidity output\nvar msg2 = {\n    payload: data.humidity || 0,\n    topic: \"humidity\",\n    timestamp: new Date().toISOString()\n};\n\n// Distance output\nvar msg3 = {\n    payload: data.ping_distance || 0,\n    topic: \"distance\",\n    timestamp: new Date().toISOString()\n};\n\nreturn [msg1, msg2, msg3];",
         "outputs": 3,
@@ -214,28 +214,29 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
-        "y": 140,
+        "x": 430,
+        "y": 120,
         "wires": [
             [
-                "020621f22bd12015",
-                "6b402f2a1f226bf5"
+                "7d34525a214c1666",
+                "eb19625d57034e3f"
             ],
             [
-                "13654640e6e0a6cd",
-                "8146bdca361b2415"
+                "908e3d8da47b5c01",
+                "63a8be4fedd4eb8c"
             ],
             [
-                "73d4dc3904338a4f",
-                "3d92dcd7847b9202"
+                "0a067c6a8712da62",
+                "e7442c9a3b527596"
             ]
         ]
     },
     {
-        "id": "cf3dc0f817be13d7",
+        "id": "cd5cf54bf5bb0131",
         "type": "inject",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "d": true,
+        "g": "3d701a27c96bc8ee",
         "name": "Simulate Sensor Data",
         "props": [
             {
@@ -246,26 +247,27 @@
                 "vt": "str"
             }
         ],
-        "repeat": "1",
+        "repeat": "",
         "crontab": "",
         "once": true,
         "onceDelay": 0.1,
         "topic": "arduino_car/sensors",
         "payload": "",
         "payloadType": "str",
-        "x": 250,
-        "y": 320,
+        "x": 180,
+        "y": 240,
         "wires": [
             [
-                "8968757a100422e5"
+                "92a820a60d6b6d84"
             ]
         ]
     },
     {
-        "id": "8968757a100422e5",
+        "id": "92a820a60d6b6d84",
         "type": "function",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "d": true,
+        "g": "3d701a27c96bc8ee",
         "name": "Generate Realistic Data",
         "func": "// Generate realistic sensor data for Arduino car\nvar data = {\n    temperature: Math.round((Math.random() * 20 + 15) * 10) / 10,  // 15-35°C\n    humidity: Math.round(Math.random() * 50 + 30),                   // 30-80%\n    ping_distance: Math.round((Math.random() * 180 + 5) * 10) / 10,  // 5-185cm\n    ldr: Math.round(Math.random() * 1024),                           // 0-1024 (analog reading)\n    timestamp: new Date().toISOString()\n};\n\nmsg.payload = data;\nmsg.topic = \"arduino_car/sensors\";\n\n// Log untuk debugging\nnode.log(`Generated data: Temp=${data.temperature}°C, Humidity=${data.humidity}%, Distance=${data.ping_distance}cm, Light=${data.ldr}`);\n\nreturn msg;",
         "outputs": 1,
@@ -274,19 +276,19 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 320,
+        "x": 430,
+        "y": 280,
         "wires": [
             [
-                "87ae8de1a3040408"
+                "ed3557f585f2c8c1"
             ]
         ]
     },
     {
-        "id": "020621f22bd12015",
+        "id": "7d34525a214c1666",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Temperature Gauge",
         "order": 2,
@@ -298,17 +300,17 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 940,
-        "y": 80,
+        "x": 700,
+        "y": 120,
         "wires": [
             []
         ]
     },
     {
-        "id": "13654640e6e0a6cd",
+        "id": "908e3d8da47b5c01",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Humidity Gauge",
         "order": 3,
@@ -327,10 +329,10 @@
         ]
     },
     {
-        "id": "73d4dc3904338a4f",
+        "id": "0a067c6a8712da62",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Distance Gauge",
         "order": 4,
@@ -349,54 +351,54 @@
         ]
     },
     {
-        "id": "bbdb4749705da9a3",
+        "id": "4f748d85ecdd34c0",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Dashboard Header",
         "order": 1,
         "width": 28,
         "height": 6,
-        "format": "<div class=\"dashboard-header\">\n    <div class=\"car-icon\">🚗</div>\n    <h1 class=\"dashboard-title\">ARDUINO CAR MONITOR</h1>\n    <p class=\"dashboard-subtitle\">Real-time Sensor Dashboard</p>\n    <p class=\"dashboard-subtitle\">Kelompok 5</p>\n    <div class=\"status-indicator\" id=\"connectionStatus\">🟢 CONNECTED</div>\n</div>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n.dashboard-header {\n    text-align: center;\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 20px;\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);\n    font-family: 'Orbitron', monospace;\n}\n\n.car-icon {\n    font-size: 2.5rem;\n    margin-bottom: 10px;\n    animation: bounce 3s ease-in-out infinite;\n}\n\n@keyframes bounce {\n    0%, 100% { transform: translateY(0); }\n    50% { transform: translateY(-8px); }\n}\n\n.dashboard-title {\n    font-size: 2.2rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 20px #00ff88;\n    margin: 10px 0;\n    animation: pulse 2s ease-in-out infinite alternate;\n}\n\n@keyframes pulse {\n    from { text-shadow: 0 0 20px #00ff88; }\n    to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}\n\n.dashboard-subtitle {\n    color: #888;\n    font-size: 1rem;\n    margin-bottom: 10px;\n}\n\n.status-indicator {\n    font-size: 0.9rem;\n    color: #00ff88;\n    font-weight: 700;\n}\n</style>",
+        "format": "<div class=\"dashboard-header\">\n    <div class=\"car-icon\">🚗</div>\n    <h1 class=\"dashboard-title\">ARDUINO CAR MONITOR</h1>\n    <p class=\"dashboard-subtitle\">Real-time Sensor Dashboard</p>\n    <p class=\"dashboard-subtitle\">Kelompok 5</p>\n    <div class=\"status-indicator\" id=\"connectionStatus\">🟢 CONNECTED</div>\n</div>\n\n<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n.dashboard-header {\n    text-align: center;\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 15px;\n    padding: 20px;\n    margin-bottom: 20px;\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);\n    font-family: 'Orbitron', monospace;\n}\n\n.car-icon {\n    font-size: 2.5rem;\n    margin-bottom: 10px;\n    animation: bounce 3s ease-in-out infinite;\n}\n\n@keyframes bounce {\n    0%, 100% { transform: translateY(0); }\n    50% { transform: translateY(-8px); }\n}\n\n.dashboard-title {\n    font-size: 2.2rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 20px #00ff88;\n    margin: 10px 0;\n    animation: pulse 2s ease-in-out infinite alternate;\n}\n\n@keyframes pulse {\n    from { text-shadow: 0 0 20px #00ff88; }\n    to { text-shadow: 0 0 30px #00ff88, 0 0 40px #00ff88; }\n}\n\n.dashboard-subtitle {\n    color: #888;\n    font-size: 1rem;\n    margin-bottom: 10px;\n}\n\n.status-indicator {\n    font-size: 0.9rem;\n    color: #00ff88;\n    font-weight: 700;\n}\n</style> ",
         "storeOutMessages": true,
         "fwdInMessages": true,
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 1250,
+        "x": 1130,
         "y": 60,
         "wires": [
             []
         ]
     },
     {
-        "id": "ee21352b9dd0e672",
+        "id": "584cd4e156399894",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Global Styles",
         "order": 10,
         "width": 28,
         "height": 1,
-        "format": "<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n/* Global Dashboard Styles */\nbody, .nr-dashboard {\n    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%) !important;\n    font-family: 'Orbitron', monospace !important;\n    color: #00ff88 !important;\n}\n\n.custom-gauge {\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 20px;\n    padding: 20px;\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    position: relative;\n    overflow: hidden;\n    font-family: 'Orbitron', monospace;\n    height: 100%;\n}\n\n.custom-gauge::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);\n    animation: shimmer 3s infinite;\n}\n\n@keyframes shimmer {\n    0% { left: -100%; }\n    100% { left: 100%; }\n}\n\n.gauge-title {\n    text-align: center;\n    font-size: 1.1rem;\n    font-weight: 700;\n    margin-bottom: 15px;\n    color: #00ff88;\n    text-transform: uppercase;\n    letter-spacing: 1px;\n}\n\n.gauge {\n    width: 160px;\n    height: 160px;\n    margin: 0 auto;\n    position: relative;\n}\n\n.gauge-svg {\n    width: 100%;\n    height: 100%;\n    transform: rotate(-90deg);\n}\n\n.gauge-bg {\n    fill: none;\n    stroke: #333;\n    stroke-width: 12;\n    stroke-linecap: round;\n} \n\n.gauge-fill {\n    fill: none;\n    stroke-width: 12;\n    stroke-linecap: round;\n    transition: stroke-dasharray 0.8s ease;\n}\n\n.gauge-value {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    font-size: 1.8rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 10px currentColor;\n    text-align: center;\n}\n\n.gauge-unit {\n    font-size: 0.7rem;\n    opacity: 0.8;\n    display: block;\n    margin-top: 3px;\n}\n\n.gauge-indicator {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    width: 2px;\n    height: 65px;\n    background: linear-gradient(to top, #ff6b35, #ffd700);\n    transform-origin: bottom center;\n    transform: translate(-50%, -100%) rotate(-135deg);\n    border-radius: 2px;\n    box-shadow: 0 0 8px rgba(255, 107, 53, 0.8);\n    transition: transform 0.8s ease;\n}\n\n/* Gauge specific colors */\n.temperature .gauge-fill { stroke: url(#tempGradient); }\n.humidity .gauge-fill { stroke: url(#humidityGradient); }\n.distance .gauge-fill { stroke: url(#distanceGradient); }\n.light .gauge-fill { stroke: url(#lightGradient); }\n</style>",
+        "format": "<style>\n@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');\n\n/* Global Dashboard Styles */\nbody, .nr-dashboard {\n    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%) !important;\n    font-family: 'Orbitron', monospace !important;\n    color: #00ff88 !important;\n}\n\n.custom-gauge {\n    background: linear-gradient(145deg, #1a1a1a, #2d2d2d);\n    border-radius: 20px;\n    padding: 20px;\n    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);\n    border: 1px solid rgba(0, 255, 136, 0.3);\n    position: relative;\n    overflow: hidden;\n    font-family: 'Orbitron', monospace;\n    height: 100%;\n}\n\n.custom-gauge::before { \n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);\n    animation: shimmer 3s infinite;\n}\n\n@keyframes shimmer {\n    0% { left: -100%; }\n    100% { left: 100%; }\n}\n\n.gauge-title {\n    text-align: center;\n    font-size: 1.1rem;\n    font-weight: 700;\n    margin-bottom: 15px;\n    color: #00ff88;\n    text-transform: uppercase;\n    letter-spacing: 1px;\n}\n\n.gauge {\n    width: 160px;\n    height: 160px;\n    margin: 0 auto;\n    position: relative;\n}\n\n.gauge-svg {\n    width: 100%;\n    height: 100%;\n    transform: rotate(-90deg);\n}\n\n.gauge-bg {\n    fill: none;\n    stroke: #333;\n    stroke-width: 12;\n    stroke-linecap: round;\n} \n\n.gauge-fill {\n    fill: none;\n    stroke-width: 12;\n    stroke-linecap: round;\n    transition: stroke-dasharray 0.8s ease;\n}\n\n.gauge-value {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n    font-size: 1.8rem;\n    font-weight: 900;\n    color: #00ff88;\n    text-shadow: 0 0 10px currentColor;\n    text-align: center;\n}\n\n.gauge-unit {\n    font-size: 0.7rem;\n    opacity: 0.8;\n    display: block;\n    margin-top: 3px;\n}\n\n.gauge-indicator {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    width: 2px;\n    height: 65px;\n    background: linear-gradient(to top, #ff6b35, #ffd700);\n    transform-origin: bottom center;\n    transform: translate(-50%, -100%) rotate(-135deg);\n    border-radius: 2px;\n    box-shadow: 0 0 8px rgba(255, 107, 53, 0.8);\n    transition: transform 0.8s ease;\n}\n\n/* Gauge specific colors */\n.temperature .gauge-fill { stroke: url(#tempGradient); }\n.humidity .gauge-fill { stroke: url(#humidityGradient); }\n.distance .gauge-fill { stroke: url(#distanceGradient); }\n.light .gauge-fill { stroke: url(#lightGradient); }\n</style>",
         "storeOutMessages": false,
         "fwdInMessages": false,
         "resendOnRefresh": true,
         "templateScope": "global",
         "className": "",
-        "x": 1250,
+        "x": 1170,
         "y": 100,
         "wires": [
             []
         ]
     },
     {
-        "id": "6b402f2a1f226bf5",
+        "id": "eb19625d57034e3f",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Temperature Chart",
         "order": 6,
@@ -408,17 +410,17 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 1070,
+        "x": 910,
         "y": 140,
         "wires": [
             []
         ]
     },
     {
-        "id": "8146bdca361b2415",
+        "id": "63a8be4fedd4eb8c",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Humidity Chart",
         "order": 7,
@@ -430,17 +432,17 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 860,
+        "x": 900,
         "y": 180,
         "wires": [
             []
         ]
     },
     {
-        "id": "3d92dcd7847b9202",
+        "id": "e7442c9a3b527596",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "5acf14ec0c638bbe",
+        "z": "058bc9fa4519e909",
+        "g": "3d701a27c96bc8ee",
         "group": "ui_group_sensors",
         "name": "Distance Chart",
         "order": 8,
@@ -452,19 +454,19 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
-        "x": 860,
+        "x": 900,
         "y": 220,
         "wires": [
             []
         ]
     },
     {
-        "id": "976d15a4a6d6cc51",
+        "id": "e3f99931978106c5",
         "type": "mqtt in",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "g": "f98ed4b07f2c62f4",
         "name": "LDR Realtime",
-        "topic": "ldr_realtime_topic",
+        "topic": "sensor/ldr",
         "qos": "2",
         "datatype": "auto",
         "broker": "810f9cc363994c26",
@@ -472,18 +474,19 @@
         "rap": false,
         "inputs": 0,
         "x": 210,
-        "y": 680,
+        "y": 600,
         "wires": [
             [
-                "d935d26fc6a1c462"
+                "ea991417e40d2e5f"
             ]
         ]
     },
     {
-        "id": "0df5f22647f3e210",
+        "id": "67a8d0e55a6684cd",
         "type": "inject",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "d": true,
+        "g": "f98ed4b07f2c62f4",
         "name": "Test LDR Realtime",
         "props": [
             {
@@ -502,18 +505,18 @@
         "payload": "512",
         "payloadType": "num",
         "x": 240,
-        "y": 760,
+        "y": 680,
         "wires": [
             [
-                "b46852623901ece3"
+                "b8d2712450ba17c7"
             ]
         ]
     },
     {
-        "id": "07d8f634da9fdd82",
+        "id": "e8e74da1fb48d18a",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "g": "f98ed4b07f2c62f4",
         "group": "ui_group_sensors",
         "name": "Light Level Gauge",
         "order": 5,
@@ -526,16 +529,17 @@
         "templateScope": "local",
         "className": "",
         "x": 790,
-        "y": 680,
+        "y": 600,
         "wires": [
             []
         ]
     },
     {
-        "id": "b46852623901ece3",
+        "id": "b8d2712450ba17c7",
         "type": "function",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "d": true,
+        "g": "f98ed4b07f2c62f4",
         "name": "Generate Test LDR Data",
         "func": "// Generate random LDR value between 0-1024\nvar ldr = Math.round(Math.random() * 1024);\n\nmsg.payload = ldr;\nmsg.topic = \"ldr_realtime_topic\";\n\nreturn msg;",
         "outputs": 1,
@@ -544,19 +548,19 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 530,
-        "y": 760,
+        "x": 510,
+        "y": 680,
         "wires": [
             [
-                "d935d26fc6a1c462"
+                "ea991417e40d2e5f"
             ]
         ]
     },
     {
-        "id": "d935d26fc6a1c462",
+        "id": "ea991417e40d2e5f",
         "type": "function",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "g": "f98ed4b07f2c62f4",
         "name": "Process LDR Data",
         "func": "// Process incoming LDR data\nvar ldrValue;\n\n// Handle different data formats\nif (typeof msg.payload === 'object' && msg.payload.ldr !== undefined) {\n    // If payload is an object with ldr property\n    ldrValue = msg.payload.ldr;\n} else if (typeof msg.payload === 'number') {\n    // If payload is directly a number\n    ldrValue = msg.payload;\n} else {\n    // Try to parse as number\n    ldrValue = parseFloat(msg.payload) || 0;\n}\n\n// Ensure value is within valid range\nldrValue = Math.max(0, Math.min(1024, ldrValue));\n\n// Create output message\nvar outputMsg = {\n    payload: ldrValue,\n    topic: \"light\",\n    timestamp: new Date().toISOString()\n};\n\nreturn outputMsg;",
         "outputs": 1,
@@ -566,19 +570,19 @@
         "finalize": "",
         "libs": [],
         "x": 430,
-        "y": 680,
+        "y": 600,
         "wires": [
             [
-                "07d8f634da9fdd82",
-                "8f65b40b22503db8"
+                "e8e74da1fb48d18a",
+                "80416184db69d91a"
             ]
         ]
     },
     {
-        "id": "8f65b40b22503db8",
+        "id": "80416184db69d91a",
         "type": "ui_template",
-        "z": "main_flow",
-        "g": "af670946a1db9987",
+        "z": "058bc9fa4519e909",
+        "g": "f98ed4b07f2c62f4",
         "group": "ui_group_sensors",
         "name": "Light Level Trend",
         "order": 9,
@@ -591,7 +595,7 @@
         "templateScope": "local",
         "className": "",
         "x": 790,
-        "y": 720,
+        "y": 640,
         "wires": [
             []
         ]
@@ -653,7 +657,7 @@
         "type": "ui_tab",
         "name": "Real-time Monitor",
         "icon": "dashboard",
-        "order": 1,
+        "order": 2,
         "disabled": false,
         "hidden": false
     }
